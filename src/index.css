@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap');
+
+@font-face {
+  font-family: 'Poppins-Klaviyo-Hosted';
+  src: url('https://static.klaviyo.com/onsite/hosted-fonts/Poppins/latin/poppins_latin_regular_400_2.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Poppins-Klaviyo-Hosted';
+  src: url('https://static.klaviyo.com/onsite/hosted-fonts/Poppins/latin/poppins_latin_italic_400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Poppins-Klaviyo-Hosted';
+  src: url('https://static.klaviyo.com/onsite/hosted-fonts/Poppins/latin/poppins_latin_regular_700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Poppins-Klaviyo-Hosted';
+  src: url('https://static.klaviyo.com/onsite/hosted-fonts/Poppins/latin/poppins_latin_italic_700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+}
+
+@theme {
+  --font-sans: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Poppins-Klaviyo-Hosted", "Poppins", system-ui, sans-serif;
+  --font-accent: "Manrope", system-ui, sans-serif;
+
+  --color-brand-red: #ef4444;
+  --color-brand-red-dark: #b91c1c;
+  --color-brand-blue: #3b82f6;
+  --color-brand-dark: #0b0b0c;
+  --color-brand-dark-card: #141416;
+  --color-brand-dark-border: #232326;
+  --color-brand-gray-bg: #f5f5f7;
+  --color-brand-light-card: #ffffff;
+  --color-brand-light-border: #e5e7eb;
+
+  --radius-brand-card: 16px;
+  --radius-brand-btn: 9999px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-brand-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-dark-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-red);
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Glow Animations */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+  }
+}
+
+.ai-glow-btn {
+  animation: pulseGlow 3s infinite ease-in-out;
+}
+
+/* Glassmorphism Styles */
+.glass-effect {
+  background: rgba(20, 20, 22, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-effect-light {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Utility class to hide scrollbar but keep functionality */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
