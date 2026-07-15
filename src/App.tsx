@@ -48,21 +48,6 @@ export default function App() {
     setView("processing");
   };
 
-  const handleVisionUpload = (file: File) => {
-    // Populate form data with defaults suited for vision analysis and the file
-    setFormData({
-      role: "Designer",
-      hours: 9,
-      problems: ["Neck pain", "Cable clutter", "Poor lighting"],
-      budget: 20,
-      style: "Modern",
-      color: "Walnut",
-      equipment: ["Monitor", "Mechanical Keyboard"],
-      photo: file,
-    });
-    setView("processing");
-  };
-
   const handleProcessingFinished = () => {
     setView("result");
   };

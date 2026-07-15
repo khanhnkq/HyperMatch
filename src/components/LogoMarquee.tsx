@@ -1,4 +1,3 @@
-import React from "react";
 
 const logos = [
   "https://hyperwork.vn/cdn/shop/files/LOGO_TIN_PHONG_122020-01_2b247acc-0245-49c5-9911-89a6e444c597.png?height=60&v=1767689940",

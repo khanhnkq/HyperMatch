@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MagnifyingGlass, User, ShoppingBag, Sparkle, CaretDown } from "@phosphor-icons/react";
+import { MagnifyingGlass, User, ShoppingBag, CaretDown } from "@phosphor-icons/react";
 
 interface HeaderProps {
   onStartAdvisor: () => void;
