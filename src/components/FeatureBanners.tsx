@@ -12,10 +12,10 @@ export default function FeatureBanners() {
           />
 
           <div className="relative z-10 flex flex-col items-center md:items-end gap-3 md:gap-4 max-w-[340px] md:max-w-[420px]">
-            <h2 className="font-display font-black text-3xl md:text-4xl lg:text-5xl text-neutral-800 tracking-tight">
+            <h2 className="font-sans font-bold text-2xl md:text-3xl lg:text-4xl text-neutral-800 tracking-tight">
               New Keyboard
             </h2>
-            <p className="text-neutral-700 text-sm md:text-base leading-relaxed">
+            <p className="font-sans text-neutral-700 text-sm md:text-base leading-relaxed">
               Bổ sung Numpad với bàn phím full size HyperOne Gen 3 Plus.
             </p>
             <a
@@ -36,15 +36,15 @@ export default function FeatureBanners() {
           />
 
           <div className="relative z-10 flex flex-col items-center md:items-start gap-3 md:gap-4 max-w-[340px] md:max-w-[420px]">
-            <h2 className="font-display font-black text-3xl md:text-4xl lg:text-5xl text-neutral-800 tracking-tight">
+            <h2 className="font-sans font-bold text-2xl md:text-3xl lg:text-4xl text-neutral-800 tracking-tight">
               Build your setup
             </h2>
-            <p className="text-neutral-700 text-sm md:text-base leading-relaxed">
+            <p className="font-sans text-neutral-700 text-sm md:text-base leading-relaxed">
               Chọn bàn, ghế, arm màn hình và phụ kiện để tạo góc làm việc đúng gu của bạn.
             </p>
             <a
               href="/pages/desk-builder"
-              className="mt-2 bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-200 font-bold text-sm px-8 py-3.5 rounded-full transition-colors active:scale-95 shadow-sm"
+              className="mt-2 bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-sm px-8 py-3.5 rounded-full transition-colors active:scale-95"
             >
               Xem thêm
             </a>
