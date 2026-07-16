@@ -7,7 +7,7 @@ interface AIAdvisorIntroProps {
 export default function AIAdvisorIntro({ onStartAdvisor }: AIAdvisorIntroProps) {
   return (
     <section className="w-full bg-white pb-1 md:pb-1 px-0 md:px-2 font-sans">
-      <div className="relative w-full overflow-hidden min-h-[560px] md:min-h-[620px] flex items-center group">
+      <div className="relative w-full overflow-hidden aspect-[2/3] md:aspect-[3/1] flex items-center group">
         {/* Background Image */}
         <picture className="absolute inset-0 w-full h-full">
           <source
@@ -35,12 +35,10 @@ export default function AIAdvisorIntro({ onStartAdvisor }: AIAdvisorIntroProps) 
             className="flex flex-col gap-3"
           >
             <h2 className="font-sans font-black text-[2rem] sm:text-[2.5rem] md:text-[3.25rem] leading-[1.08] tracking-tight text-white">
-              Build Your
-              <br />
-              Perfect Workspace
+              AI Workspace Setup
             </h2>
             <p className="text-white/70 text-sm sm:text-base md:text-lg leading-relaxed max-w-md font-light">
-              Trả lời vài câu hỏi đơn giản, AI sẽ phân tích và đề xuất setup workspace phù hợp nhất dựa trên nhu cầu làm việc, phong cách và ngân sách của bạn.
+              Trả lời vài câu hỏi đơn giản, AI sẽ phân tích và đề xuất setup workspace phù hợp nhất với bạn.
             </p>
           </motion.div>
 

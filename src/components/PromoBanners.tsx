@@ -4,8 +4,8 @@ import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 const slides = [
   {
     id: 5,
-    image: "https://hyperwork.vn/cdn/shop/files/HPWT93781_11zon.jpg?v=1760322746&width=2800",
-    kicker: "AI Workspace Advisor",
+    image: "https://hyperwork.vn/cdn/shop/files/594963097_1171542285183580_3994440484315189889_n.jpg?v=1769765615&width=2400",
+    kicker: "AI Workspace Setup",
     heading: "Build Your Perfect Workspace",
     caption: "Trả lời vài câu hỏi đơn giản, AI sẽ phân tích và đề xuất setup workspace phù hợp nhất.",
     buttonText: "Bắt đầu ngay",
@@ -31,7 +31,7 @@ const slides = [
   },
   {
     id: 3,
-    image: "https://hyperwork.vn/cdn/shop/files/HPWT93781_11zon.jpg?v=1760322746&width=2800",
+    image: "https://hyperwork.vn/cdn/shop/files/DS02_-_Setups_-_s1_-_1_11zon.jpg?v=1764125309&width=2800",
     kicker: "Giải pháp văn phòng",
     heading: "cho Doanh nghiệp",
     caption: "Hệ sinh thái đồng bộ - bền bỉ - tiết kiệm.",

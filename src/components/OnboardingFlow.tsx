@@ -42,14 +42,14 @@ interface OnboardingFlowProps {
 const STEPS_COUNT = 8;
 
 const STEP_BACKGROUNDS = [
-  "https://hyperwork.vn/cdn/shop/files/HPWT93781_11zon.jpg?v=1760322746&width=1400",
+  "https://hyperwork.vn/cdn/shop/files/Pro-Capture_One_02s47_11zon.jpg?v=1767460861&width=1400",
   "https://hyperwork.vn/cdn/shop/files/DSC08799_11zon.jpg?v=1760324549&width=1400",
   "https://hyperwork.vn/cdn/shop/files/74_03594_11zon_54604b3d-de7f-4649-9ad5-ffbbc9217547.jpg?v=1760323357&width=1400",
-  "https://hyperwork.vn/cdn/shop/files/Pro-Capture_One_s0185_copy_c31225e9-4c6b-45ea-a93f-a864cadb3011.jpg?v=1782875762&width=1400",
-  "https://hyperwork.vn/cdn/shop/files/11_csopy_11zon.jpg?v=1783390458&width=1400",
+  "https://hyperwork.vn/cdn/shop/files/DS02_-_Setups_-_s1_-_1_11zon.jpg?v=1764125309&width=1400",
+  "https://hyperwork.vn/cdn/shop/files/7_11zon_c0723dc0-f933-41e3-803f-f54077b85ef3.jpg?v=1770626747&width=1400",
   "https://hyperwork.vn/cdn/shop/files/HPWT93781_11zon.jpg?v=1760322746&width=1400",
-  "https://hyperwork.vn/cdn/shop/files/DSC08799_11zon.jpg?v=1760324549&width=1400",
-  "https://hyperwork.vn/cdn/shop/files/74_03594_11zon_54604b3d-de7f-4649-9ad5-ffbbc9217547.jpg?v=1760323357&width=1400",
+  "https://hyperwork.vn/cdn/shop/files/DSC00717_11zon.jpg?v=1772008928&width=1400",
+  "https://hyperwork.vn/cdn/shop/files/DP03_-_12s_11zon.jpg?v=1760163088&width=1400",
 ];
 
 const ROLES = [
@@ -77,25 +77,25 @@ const STYLES = [
     id: "Minimal",
     label: "Minimalist",
     desc: "Sạch sẽ & thoáng đãng",
-    image: "https://hyperwork.vn/cdn/shop/files/Capture_One_Catalog05971_11zon.svg",
+    image: "https://hyperwork.vn/cdn/shop/files/DS02_-_Setups_-_s1_-_1_11zon.jpg?v=1764125309&width=720",
   },
   {
     id: "Modern",
     label: "Modern Tech",
     desc: "Kính & kim loại",
-    image: "https://hyperwork.vn/cdn/shop/files/Pro-Capture_One_s0185_copy_c31225e9-4c6b-45ea-a93f-a864cadb3011.jpg?v=1782875762&width=600",
+    image: "https://hyperwork.vn/cdn/shop/files/593454481_1171545718516570_984208308408370112_n.jpg?v=1767493515&width=720",
   },
   {
     id: "Dark",
     label: "Matte Dark",
     desc: "Phong cách tối giản",
-    image: "https://hyperwork.vn/cdn/shop/files/11_csopy_11zon.jpg?v=1783390458&width=600",
+    image: "https://hyperwork.vn/cdn/shop/files/DSC06746_11zon.jpg?v=1769762780&width=720",
   },
   {
     id: "Wooden",
     label: "Warm Wood",
     desc: "Gỗ tự nhiên & cây xanh",
-    image: "https://hyperwork.vn/cdn/shop/files/Setup1-PG02-2_11zon_1.jpg",
+    image: "https://hyperwork.vn/cdn/shop/files/594963097_1171542285183580_3994440484315189889_n.jpg?v=1769765615&width=720",
   }
 ];
 
