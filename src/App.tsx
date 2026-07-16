@@ -3,6 +3,7 @@ import Header from "./components/Header.tsx";
 import Hero from "./components/Hero.tsx";
 import FeatureBanners from "./components/FeatureBanners.tsx";
 import NewArrivals from "./components/NewArrivals.tsx";
+import UserCommunity from "./components/UserCommunity.tsx";
 import PromoBanners from "./components/PromoBanners.tsx";
 import AdvisorOnboarding from "./components/AdvisorOnboarding.tsx";
 import AIProcessing from "./components/AIProcessing.tsx";
@@ -64,6 +65,7 @@ export default function App() {
             <PromoBanners />
             <ProductCategories />
             <NewArrivals />
+            <UserCommunity />
             <LogoMarquee />
             <BlogPosts />
             <FAQSection />
