@@ -1,11 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
-  X,
-  CheckCircle,
-  ShieldCheck,
-  CreditCard
+  Heart,
+  ShareNetwork,
+  CheckCircle
 } from "@phosphor-icons/react";
+import productsData from "../data/products.json";
 
 interface OnboardingData {
   role: string;
@@ -23,489 +23,707 @@ interface WorkspaceResultProps {
   onRestart: () => void;
 }
 
-interface SetupSuggestion {
-  id: string;
-  image: string;
+
+interface ShopifyProduct {
+  id: number;
   title: string;
-  style: "Minimalist" | "Ergonomic" | "Creator" | "Cozy";
-  color: "Walnut" | "White" | "Black";
-  price: number;
-  description: string;
-  products: string[];
-  aspectRatio: string; // for Pinterest variance
+  handle: string;
+  images: { src: string }[];
+  variants: { price: string; title: string; available: boolean }[];
 }
 
-const SETUP_SUGGESTIONS: SetupSuggestion[] = [
+const shopifyProducts = productsData.products as ShopifyProduct[];
+
+// Helper to look up real shopify product data from local json
+function findRealProduct(keyword: string, fallbackName: string, fallbackPrice: number, fallbackImage: string, fallbackUrl: string) {
+  const found = shopifyProducts.find(p =>
+    p.handle.toLowerCase().includes(keyword.toLowerCase()) ||
+    p.title.toLowerCase().includes(keyword.toLowerCase())
+  );
+
+  if (found) {
+    const priceStr = found.variants[0]?.price || fallbackPrice.toString();
+    return {
+      productName: found.title.replace(/\|.*/, "").trim(), // clean title
+      price: parseInt(priceStr),
+      productImage: found.images[0]?.src || fallbackImage,
+      buyUrl: `https://hyperwork.vn/products/${found.handle}`
+    };
+  }
+  return {
+    productName: fallbackName,
+    price: fallbackPrice,
+    productImage: fallbackImage,
+    buyUrl: fallbackUrl
+  };
+}
+
+const SETUP_SUGGESTIONS_RAW = [
   {
     id: "s1",
     image: "https://hyperwork.vn/cdn/shop/files/Setup_Tet_2026_-_5_11zon.jpg?v=1770620641&width=720",
     title: "Minimalist White Studio",
-    style: "Minimalist",
-    color: "White",
-    price: 6900000,
-    description: "Không gian làm việc tông màu trắng tối giản kiểu Bắc Âu, tràn ngập ánh sáng tự nhiên với các thiết bị ẩn cáp gọn gàng.",
-    products: ["Bàn phím không dây HyperOne Gen 3", "Arm màn hình Single T6 Pro", "Lót chuột da HyperWork", "Khay đi dây ẩn dưới bàn"],
-    aspectRatio: "aspect-[3/4]"
+    style: "Minimalist" as const,
+    color: "White" as const,
+    description: "Không gian tông trắng Bắc Âu tối giản.",
+    aspectRatio: "aspect-[3/4]",
+    baseScore: 55,
+    hotspots: [
+      {
+        id: "s1-p1",
+        top: 72,
+        left: 50,
+        keyword: "airy-oc02",
+        productCategory: "Ergonomic Chair",
+        fallbackName: "Ghế OC02 Airy White",
+        fallbackPrice: 2590000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/PA02-4.jpg?v=1783495643&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ghe-cong-thai-hoc-hyperwork-airy-oc02",
+        impactScore: 15,
+        matchReason: "Lưới thoáng khí chuẩn Ergonomic."
+      },
+      {
+        id: "s1-p2",
+        top: 38,
+        left: 48,
+        keyword: "t6-pro",
+        productCategory: "Monitor Arm",
+        fallbackName: "Arm màn hình Single T6 Pro White",
+        fallbackPrice: 1290000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/1_85c5273e-dbf2-40e8-ae68-aaabd2723afa.jpg?v=1782961460&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/arm-man-hinh-human-motion-t6-pro",
+        impactScore: 10,
+        matchReason: "Nâng màn hình ngang tầm mắt bảo vệ cổ."
+      },
+      {
+        id: "s1-p3",
+        top: 56,
+        left: 45,
+        keyword: "silent-key",
+        productCategory: "Keyboard",
+        fallbackName: "Bàn phím cơ HyperWork Silent White",
+        fallbackPrice: 1490000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/11_csopy_11zon.jpg?v=1783390458&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ban-phim-co-hyperwork-silent-key-edition",
+        impactScore: 5,
+        matchReason: "Gõ phím êm ái, giảm tiếng ồn."
+      },
+      {
+        id: "s1-p4",
+        top: 65,
+        left: 32,
+        keyword: "atlas",
+        productCategory: "Smart Desk",
+        fallbackName: "Bàn nâng hạ thông minh Atlas White",
+        fallbackPrice: 5990000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/Pro-Capture_One_s0185_copy_c31225e9-4c6b-45ea-a93f-a864cadb3011.jpg?v=1782875762&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ban-nang-ha-thong-minh-hyperwork-atlas",
+        impactScore: 15,
+        matchReason: "Đứng/ngồi linh hoạt tránh mỏi thắt lưng."
+      }
+    ]
   },
   {
     id: "s2",
     image: "https://hyperwork.vn/cdn/shop/files/593454481_1171545718516570_984208308408370112_n.jpg?v=1767493515&width=720",
     title: "Developer Dark Terminal",
-    style: "Minimalist",
-    color: "Black",
-    price: 8500000,
-    description: "Góc làm việc cực ngầu với màn hình ultrawide lớn cho lập trình viên ưa thích chế độ tối, giúp tăng độ tập trung cao độ.",
-    products: ["Arm màn hình P1 Single Black", "Bàn nâng hạ thông minh màu đen", "Giá đỡ laptop", "Lót chuột nỉ tối màu"],
-    aspectRatio: "aspect-[4/5]"
+    style: "Minimalist" as const,
+    color: "Black" as const,
+    description: "Góc làm việc ultrawide cho lập trình viên.",
+    aspectRatio: "aspect-[4/5]",
+    baseScore: 50,
+    hotspots: [
+      {
+        id: "s2-p1",
+        top: 76,
+        left: 48,
+        keyword: "sleek",
+        productCategory: "Ergonomic Chair",
+        fallbackName: "Ghế Sleek Ergonomic Black",
+        fallbackPrice: 5500000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/PA02-4.jpg?v=1783495643&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ghe-cong-thai-hoc-hyperwork-sleek",
+        impactScore: 15,
+        matchReason: "Tự động ôm sát và hỗ trợ vùng thắt lưng."
+      },
+      {
+        id: "s2-p2",
+        top: 35,
+        left: 52,
+        keyword: "p1",
+        productCategory: "Monitor Arm",
+        fallbackName: "Arm màn hình P1 Single Black",
+        fallbackPrice: 1690000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/1_85c5273e-dbf2-40e8-ae68-aaabd2723afa.jpg?v=1782961460&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/gia-do-man-hinh-hyperwork-p1",
+        impactScore: 10,
+        matchReason: "Nâng đỡ màn hình lớn, mở rộng mặt bàn."
+      },
+      {
+        id: "s2-p3",
+        top: 58,
+        left: 50,
+        keyword: "hyperone-gen-3",
+        productCategory: "Keyboard",
+        fallbackName: "Bàn phím không dây HyperOne Gen 3 Black",
+        fallbackPrice: 850000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/11_csopy_11zon.jpg?v=1783390458&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ban-phim-khong-day-hyperone-gen-3",
+        impactScore: 5,
+        matchReason: "Kết nối đa thiết bị, phím gõ êm."
+      },
+      {
+        id: "s2-p4",
+        top: 64,
+        left: 28,
+        keyword: "atlas",
+        productCategory: "Smart Desk",
+        fallbackName: "Bàn nâng hạ thông minh Atlas Black",
+        fallbackPrice: 5990000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/Pro-Capture_One_s0185_copy_c31225e9-4c6b-45ea-a93f-a864cadb3011.jpg?v=1782875762&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ban-nang-ha-thong-minh-hyperwork-atlas",
+        impactScore: 15,
+        matchReason: "Khung thép chịu lực, đổi độ cao nhanh."
+      }
+    ]
   },
   {
     id: "s3",
     image: "https://hyperwork.vn/cdn/shop/files/Pro-Capture_One_02s47_11zon.jpg?v=1767460861&width=720",
     title: "Ergonomic Walnut Suite",
-    style: "Ergonomic",
-    color: "Walnut",
-    price: 14500000,
-    description: "Cấu hình bàn gỗ Walnut ấm áp kết hợp ghế ngồi công thái học toàn diện bảo vệ cột sống cho người ngồi làm việc lâu.",
-    products: ["Ghế Sleek Ergonomic", "Bàn nâng hạ gỗ tự nhiên Walnut", "Đèn treo màn hình chống lóa", "Kệ màn hình gỗ sồi"],
-    aspectRatio: "aspect-[3/2]"
+    style: "Ergonomic" as const,
+    color: "Walnut" as const,
+    description: "Cấu hình bàn gỗ Walnut và ghế công thái học.",
+    aspectRatio: "aspect-[3/2]",
+    baseScore: 50,
+    hotspots: [
+      {
+        id: "s3-p1",
+        top: 74,
+        left: 52,
+        keyword: "sleek",
+        productCategory: "Ergonomic Chair",
+        fallbackName: "Ghế Sleek Ergonomic Gray",
+        fallbackPrice: 5500000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/PA02-4.jpg?v=1783495643&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ghe-cong-thai-hoc-hyperwork-sleek",
+        impactScore: 15,
+        matchReason: "Tựa đầu 3D nâng đỡ đốt sống cổ tối ưu."
+      },
+      {
+        id: "s3-p2",
+        top: 36,
+        left: 45,
+        keyword: "p1",
+        productCategory: "Monitor Arm",
+        fallbackName: "Arm màn hình P1 Single Silver",
+        fallbackPrice: 1690000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/1_85c5273e-dbf2-40e8-ae68-aaabd2723afa.jpg?v=1782961460&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/gia-do-man-hinh-hyperwork-p1",
+        impactScore: 10,
+        matchReason: "Nhôm đúc cao cấp, đồng bộ gỗ tự nhiên."
+      },
+      {
+        id: "s3-p3",
+        top: 62,
+        left: 38,
+        keyword: "atlas",
+        productCategory: "Smart Desk",
+        fallbackName: "Bàn nâng hạ thông minh Atlas Walnut",
+        fallbackPrice: 6290000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/Pro-Capture_One_s0185_copy_c31225e9-4c6b-45ea-a93f-a864cadb3011.jpg?v=1782875762&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ban-nang-ha-thong-minh-hyperwork-atlas",
+        impactScore: 15,
+        matchReason: "Mặt bàn gỗ sồi Walnut vân tự nhiên."
+      },
+      {
+        id: "s3-p4",
+        top: 52,
+        left: 65,
+        keyword: "ke-man-hinh",
+        productCategory: "Accessories",
+        fallbackName: "Kệ màn hình Monitor Stand gỗ sồi",
+        fallbackPrice: 690000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/Tr_ngLight-Bogoc_8.jpg?v=1774005903&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ke-man-hinh-go-soi",
+        impactScore: 5,
+        matchReason: "Thêm khoảng trống dưới gầm cất bàn phím."
+      }
+    ]
   },
   {
     id: "s4",
     image: "https://hyperwork.vn/cdn/shop/files/DS02_-_Setups_-_s1_-_1_11zon.jpg?v=1764125309&width=720",
     title: "Dual-Screen Productive Desk",
-    style: "Ergonomic",
-    color: "Walnut",
-    price: 11200000,
-    description: "Tối ưu hóa không gian hiển thị bằng 2 màn hình xoay ngang dọc đa nhiệm cực kỳ mượt mà trên mặt bàn gỗ sồi tự nhiên.",
-    products: ["Arm màn hình kép P1 Dual", "Ghế công thái học HyperWork", "Kệ màn hình đôi", "Bộ dụng cụ vệ sinh deskmat"],
-    aspectRatio: "aspect-[4/3]"
+    style: "Ergonomic" as const,
+    color: "Walnut" as const,
+    description: "Tối ưu hóa không gian hiển thị bằng 2 màn hình.",
+    aspectRatio: "aspect-[4/3]",
+    baseScore: 55,
+    hotspots: [
+      {
+        id: "s4-p1",
+        top: 76,
+        left: 54,
+        keyword: "sleek",
+        productCategory: "Ergonomic Chair",
+        fallbackName: "Ghế Sleek Ergonomic Gray",
+        fallbackPrice: 5500000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/PA02-4.jpg?v=1783495643&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ghe-cong-thai-hoc-hyperwork-sleek",
+        impactScore: 15,
+        matchReason: "Bảo vệ đĩa đệm và cột sống khi ngồi lâu."
+      },
+      {
+        id: "s4-p2",
+        top: 40,
+        left: 45,
+        keyword: "p1-dual",
+        productCategory: "Monitor Arm",
+        fallbackName: "Arm màn hình kép P1 Dual Silver",
+        fallbackPrice: 2990000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/1_85c5273e-dbf2-40e8-ae68-aaabd2723afa.jpg?v=1782961460&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/gia-do-man-hinh-hyperwork-p1-dual",
+        impactScore: 15,
+        matchReason: "Nâng đỡ 2 màn hình tăng hiệu suất đa nhiệm."
+      },
+      {
+        id: "s4-p3",
+        top: 64,
+        left: 36,
+        keyword: "atlas",
+        productCategory: "Smart Desk",
+        fallbackName: "Bàn nâng hạ thông minh Atlas Walnut",
+        fallbackPrice: 6290000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/Pro-Capture_One_s0185_copy_c31225e9-4c6b-45ea-a93f-a864cadb3011.jpg?v=1782875762&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ban-nang-ha-thong-minh-hyperwork-atlas",
+        impactScore: 15,
+        matchReason: "Khung thép vững chãi chịu tải cao."
+      }
+    ]
   },
   {
     id: "s5",
     image: "https://hyperwork.vn/cdn/shop/files/999.jpg?v=1763115139&width=720",
     title: "Cozy Keeb Custom Corner",
-    style: "Cozy",
-    color: "Walnut",
-    price: 4200000,
-    description: "Góc setup ấm cúng cho người đam mê phím cơ custom cao cấp, mang lại cảm hứng sáng tạo dịu nhẹ.",
-    products: ["Bàn phím cơ HyperWork Silent", "Đèn bàn gỗ HyperWork", "Thảm di chuột nỉ", "Kệ phím acrylic"],
-    aspectRatio: "aspect-[4/5]"
-  },
-  {
-    id: "s6",
-    image: "https://hyperwork.vn/cdn/shop/files/DP03_-_12s_11zon.jpg?v=1760163088&width=720",
-    title: "Mechanical Design Station",
-    style: "Creator",
-    color: "Black",
-    price: 5900000,
-    description: "Trang bị bàn phím cơ kết nối nhanh đa thiết bị giúp designer chuyển đổi liền mạch giữa laptop và PC vẽ.",
-    products: ["Bàn phím cơ HyperOne", "Đế sạc nhanh 100W", "Arm màn hình P1 Single"],
-    aspectRatio: "aspect-[3/4]"
-  },
-  {
-    id: "s7",
-    image: "https://hyperwork.vn/cdn/shop/files/DSC06746_11zon.jpg?v=1769762780&width=720",
-    title: "Creator Dual Workspace",
-    style: "Creator",
-    color: "Black",
-    price: 15800000,
-    description: "Cấu hình chuyên nghiệp đa màn hình đáp ứng hoàn hảo nhu cầu dựng phim, chỉnh ảnh và live stream mượt mà.",
-    products: ["Arm màn hình kép P1 Dual", "Bàn nâng hạ thông minh", "Ghế Sleek Ergonomic Black"],
-    aspectRatio: "aspect-[1/1]"
-  },
-  {
-    id: "s8",
-    image: "https://hyperwork.vn/cdn/shop/files/DSC00112_11zon.jpg?v=1769756662&width=720",
-    title: "Minimal Laptop Stand Desk",
-    style: "Minimalist",
-    color: "White",
-    price: 2500000,
-    description: "Góc làm việc di động tinh gọn, tập trung nâng cao vị trí màn hình laptop ngang tầm mắt để bảo vệ đốt sống cổ.",
-    products: ["Giá đỡ laptop nhôm nguyên khối", "Chuột yên lặng Silent Mouse", "Kệ mini để bàn"],
-    aspectRatio: "aspect-[4/3]"
-  },
-  {
-    id: "s9",
-    image: "https://hyperwork.vn/cdn/shop/files/Human_Motion_T6_Pro_1_of_25__11zon.jpg?v=1769763257&width=720",
-    title: "Ergonomic Focus Station",
-    style: "Ergonomic",
-    color: "Black",
-    price: 7800000,
-    description: "Đỉnh cao của sự tập trung với hệ thống đỡ màn hình chuyển động linh hoạt và ghế công thái học.",
-    products: ["Ghế Sleek Ergonomic", "Arm màn hình T6 Pro Black", "Đèn treo màn hình chống lóa"],
-    aspectRatio: "aspect-[3/4]"
-  },
-  {
-    id: "s10",
-    image: "https://hyperwork.vn/cdn/shop/files/Setup_PG02_-_7_11zon.jpg?v=1772006737&width=720",
-    title: "Cozy Pegboard Green Room",
-    style: "Cozy",
-    color: "Walnut",
-    price: 4900000,
-    description: "Góc làm việc xanh mát kết hợp tấm pegboard kim loại treo đồ trang trí và tối ưu hóa diện tích mặt bàn.",
-    products: ["Pegboard gỗ tự nhiên", "Đèn bàn decor", "Arm màn hình Single P1"],
-    aspectRatio: "aspect-[4/5]"
-  },
-  {
-    id: "s11",
-    image: "https://hyperwork.vn/cdn/shop/files/MA03_-_4_11zon.jpg?v=1772008003&width=720",
-    title: "Monochrome Matte Workspace",
-    style: "Minimalist",
-    color: "Black",
-    price: 8200000,
-    description: "Sự kết hợp hoàn hảo giữa tông đen lì sang trọng và chất liệu da của deskmat cao cấp.",
-    products: ["Thảm da deskmat HyperWork", "Chuột Silent", "Bàn nâng hạ thông minh màu đen"],
-    aspectRatio: "aspect-[3/2]"
-  },
-  {
-    id: "s12",
-    image: "https://hyperwork.vn/cdn/shop/files/DSC00717_11zon.jpg?v=1772008928&width=720",
-    title: "Pocket Minimalist Setup",
-    style: "Minimalist",
-    color: "White",
-    price: 3600000,
-    description: "Thiết kế cực kỳ tinh gọn cho căn hộ diện tích nhỏ, tối đa hóa không gian trống cho mặt bàn.",
-    products: ["Bàn phím cơ HyperWork Silent White", "Đế sạc nhanh không dây", "Dock đứng laptop"],
-    aspectRatio: "aspect-[4/5]"
-  },
-  {
-    id: "s13",
-    image: "https://hyperwork.vn/cdn/shop/files/2025-05-06_11-09-11_B_R8_S4__11zon_54847077-3e8e-413a-8536-e0d2141b0af7.jpg?v=1772007734&width=720",
-    title: "Professional Vesa Workspace",
-    style: "Ergonomic",
-    color: "Black",
-    price: 9900000,
-    description: "Không gian làm việc năng suất cao với màn hình treo lơ lửng, giải phóng toàn bộ không gian bên dưới.",
-    products: ["Arm màn hình kép P1 Dual Black", "Đèn treo màn hình", "Ghế Sleek Ergonomic"],
-    aspectRatio: "aspect-[4/3]"
-  },
-  {
-    id: "s14",
-    image: "https://hyperwork.vn/cdn/shop/files/635157572_2836550153359461_8391164397209442871_n.jpg?v=1772009483&width=720",
-    title: "Creative Warm Oak Desk",
-    style: "Creator",
-    color: "Walnut",
-    price: 11500000,
-    description: "Sử dụng tông gỗ ấm áp phối cùng ánh sáng vàng dịu giúp giảm căng thẳng đầu óc khi làm việc sáng tạo.",
-    products: ["Bàn nâng hạ gỗ tự nhiên", "Arm màn hình P1", "Đèn bàn gỗ decor"],
-    aspectRatio: "aspect-[3/4]"
-  },
-  {
-    id: "s15",
-    image: "https://hyperwork.vn/cdn/shop/files/622096201_1212275034443638_7158627852507820970_n.jpg?v=1772009663&width=720",
-    title: "Developer Dark Lab",
-    style: "Creator",
-    color: "Black",
-    price: 9200000,
-    description: "Không gian lập trình đêm khuya với tông màu tối huyền bí và đèn hắt nền chống mỏi mắt.",
-    products: ["Arm màn hình P1 Single Black", "Bàn nâng hạ màu đen", "Bàn phím cơ Silent"],
-    aspectRatio: "aspect-[1/1]"
-  },
-  {
-    id: "s16",
-    image: "https://hyperwork.vn/cdn/shop/files/627257176_1217176723953469_5190057105287826845_n.jpg?v=1772009787&width=720",
-    title: "Minimal White Pegboard Setup",
-    style: "Minimalist",
-    color: "White",
-    price: 4100000,
-    description: "Góc setup trắng ngọc tinh khôi kết hợp bảng pegboard treo phụ kiện trang trí gọn gàng ngăn nắp.",
-    products: ["Pegboard HyperWork White", "Khay đi dây thông minh", "Giá đỡ laptop nhôm"],
-    aspectRatio: "aspect-[4/5]"
-  },
-  {
-    id: "s17",
-    image: "https://hyperwork.vn/cdn/shop/files/615384160_1202335142104294_3781823295888435848_n.jpg?v=1772012213&width=720",
-    title: "Cozy Study Desk Setup",
-    style: "Cozy",
-    color: "Walnut",
-    price: 3200000,
-    description: "Góc học tập và làm việc nhẹ nhàng, phối trộn hài hòa giữa gỗ tự nhiên và cây xanh mát mắt.",
-    products: ["Bàn phím không dây HyperOne", "Chuột Silent", "Đèn bàn gỗ decor"],
-    aspectRatio: "aspect-[3/4]"
+    style: "Cozy" as const,
+    color: "Walnut" as const,
+    description: "Góc setup phím cơ custom ấm cúng.",
+    aspectRatio: "aspect-[4/5]",
+    baseScore: 60,
+    hotspots: [
+      {
+        id: "s5-p1",
+        top: 62,
+        left: 50,
+        keyword: "silent-key",
+        productCategory: "Keyboard",
+        fallbackName: "Bàn phím cơ HyperWork Silent",
+        fallbackPrice: 1490000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/11_csopy_11zon.jpg?v=1783390458&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ban-phim-co-hyperwork-silent-key-edition",
+        impactScore: 10,
+        matchReason: "Switch Silent êm ái tập trung sâu."
+      },
+      {
+        id: "s5-p2",
+        top: 48,
+        left: 42,
+        keyword: "litemax",
+        productCategory: "Light",
+        fallbackName: "Đèn treo màn hình Litemax",
+        fallbackPrice: 1190000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/Tr_ngLight-Bogoc_8.jpg?v=1774005903&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/den-treo-man-hinh-hyperwork-litemax",
+        impactScore: 10,
+        matchReason: "Ánh sáng chống mỏi mắt ban đêm."
+      },
+      {
+        id: "s5-p3",
+        top: 68,
+        left: 50,
+        keyword: "felt-desk-pad",
+        productCategory: "Accessories",
+        fallbackName: "Thảm lót chuột nỉ HyperWork",
+        fallbackPrice: 390000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/PA02-1.jpg?v=1783495644&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/tham-trai-ban-lam-viec-felt-desk-pad",
+        impactScore: 5,
+        matchReason: "Chất liệu nỉ mịn chống trầy sước bàn."
+      }
+    ]
   }
 ];
 
 export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProps) {
-  const [activeSetup, setActiveSetup] = useState<SetupSuggestion | null>(null);
+  // Resolve real shopify products into database dynamically
+  const suggestions = useMemo(() => {
+    return SETUP_SUGGESTIONS_RAW.map(setup => ({
+      ...setup,
+      hotspots: setup.hotspots.map(h => {
+        const real = findRealProduct(h.keyword, h.fallbackName, h.fallbackPrice, h.fallbackImage, h.fallbackUrl);
+        return {
+          id: h.id,
+          top: h.top,
+          left: h.left,
+          productName: real.productName,
+          productCategory: h.productCategory,
+          price: real.price,
+          buyUrl: real.buyUrl,
+          productImage: real.productImage,
+          impactScore: h.impactScore,
+          matchReason: h.matchReason
+        };
+      })
+    }));
+  }, []);
 
-  // Calculate recommendation score for each setup based on onboarding data
   const scoredSuggestions = useMemo(() => {
-    return SETUP_SUGGESTIONS.map((setup) => {
+    return suggestions.map((setup) => {
       let score = 0;
-
-      // 1. Style Match (Max 40 points)
-      // Map user style selection to suggestion style
-      // user style options: "Minimal" | "Modern" | "Dark" | "Wooden"
       let styleMapped: string = setup.style;
       if (data.style === "Minimal") styleMapped = "Minimalist";
       else if (data.style === "Wooden") styleMapped = "Cozy";
       else if (data.style === "Dark") styleMapped = "Creator";
       else if (data.style === "Modern") styleMapped = "Ergonomic";
 
-      if (setup.style === styleMapped) {
-        score += 40;
-      } else {
-        // partial match
-        score += 15;
-      }
+      if (setup.style === styleMapped) score += 40;
+      else score += 15;
 
-      // 2. Color Match (Max 35 points)
-      // user color options: "Walnut" | "White" | "Black"
-      if (setup.color === data.color) {
-        score += 35;
-      } else {
-        score += 10;
-      }
+      if (setup.color === data.color) score += 35;
+      else score += 10;
 
-      // 3. Budget Match (Max 25 points)
-      // user budget in Millions VND (e.g. 15 = 15,000,000)
       const budgetVND = data.budget * 1000000;
-      if (setup.price <= budgetVND) {
-        // fits budget perfectly
-        score += 25;
-      } else if (setup.price <= budgetVND * 1.25) {
-        // slightly over budget
-        score += 15;
-      } else {
-        // way over budget
-        score += 5;
-      }
+      const setupPrice = setup.hotspots.reduce((sum, h) => sum + h.price, 0);
+      if (setupPrice <= budgetVND) score += 25;
+      else if (setupPrice <= budgetVND * 1.25) score += 15;
+      else score += 5;
 
       return {
         ...setup,
         matchScore: score
       };
     }).sort((a, b) => b.matchScore - a.matchScore);
-  }, [data]);
+  }, [data, suggestions]);
 
-  // Top 3 matches
-  const topMatches = useMemo(() => scoredSuggestions.slice(0, 3), [scoredSuggestions]);
-  // Other matches
-  const remainingMatches = useMemo(() => scoredSuggestions.slice(3), [scoredSuggestions]);
+  const [activeSetupId, setActiveSetupId] = useState<string>(scoredSuggestions[0].id);
+
+  const activeSuggestion = useMemo(() => {
+    return scoredSuggestions.find(s => s.id === activeSetupId) || scoredSuggestions[0];
+  }, [activeSetupId, scoredSuggestions]);
+
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [previewMode, setPreviewMode] = useState<"concept" | "before">("concept");
+
+  useEffect(() => {
+    setSelectedProductIds(activeSuggestion.hotspots.map(h => h.id));
+  }, [activeSetupId, activeSuggestion]);
+
+  const totalCost = useMemo(() => {
+    const activeHotspots = activeSuggestion.hotspots.filter(h => selectedProductIds.includes(h.id));
+    return activeHotspots.reduce((sum, h) => sum + h.price, 0);
+  }, [activeSuggestion, selectedProductIds]);
+
+  const finalScore = useMemo(() => {
+    const activeHotspots = activeSuggestion.hotspots.filter(h => selectedProductIds.includes(h.id));
+    const addedScore = activeHotspots.reduce((sum, h) => sum + h.impactScore, 0);
+    return Math.min(100, activeSuggestion.baseScore + addedScore);
+  }, [activeSuggestion, selectedProductIds]);
+
+  const [hoveredHotspotId, setHoveredHotspotId] = useState<string | null>(null);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [showShareToast, setShowShareToast] = useState(false);
+
+  const userPhotoUrl = useMemo(() => {
+    if (data.photo) {
+      try {
+        return URL.createObjectURL(data.photo);
+      } catch (e) {
+        console.error("Error creating Object URL for uploaded photo", e);
+      }
+    }
+    return "https://hyperwork.vn/cdn/shop/files/7_11zon_c0723dc0-f933-41e3-803f-f54077b85ef3.jpg?v=1770626747&width=720";
+  }, [data.photo]);
+
+  const toggleProduct = (id: string) => {
+    if (selectedProductIds.includes(id)) {
+      setSelectedProductIds(selectedProductIds.filter(pid => pid !== id));
+    } else {
+      setSelectedProductIds([...selectedProductIds, id]);
+    }
+  };
+
+  const handleShare = () => {
+    const shareUrl = `${window.location.origin}/?share=true&style=${data.style}&color=${data.color}&role=${data.role}`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setShowShareToast(true);
+      setTimeout(() => setShowShareToast(false), 3000);
+    });
+  };
 
   return (
-    <div className="w-full bg-white min-h-screen text-neutral-900 py-20 px-6 md:px-12 font-sans select-none">
-      <div className="max-w-7xl mx-auto flex flex-col gap-16">
+    <div className="w-full bg-white text-neutral-900 pt-28 pb-12 px-6 md:px-12 font-sans select-none relative">
+      {/* Share Toast */}
+      <AnimatePresence>
+        {showShareToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-neutral-955 text-white text-xs font-bold px-6 py-3 rounded-full shadow-lg flex items-center gap-2"
+          >
+            <CheckCircle size={14} weight="fill" />
+            <span>Đã sao chép link chia sẻ!</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        {/* HEADER BLOCK (BORDERLESS) */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b-0">
-          <div className="flex flex-col gap-3">
+      <div className="max-w-7xl mx-auto flex flex-col gap-10">
 
-            <h2 className="font-display font-black text-4xl md:text-5xl tracking-tight text-neutral-900 leading-tight">
-              Góc Setup gợi ý cho bạn
+        {/* HEADER BLOCK (CLEAN & SIMPLE) */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
+          <div className="flex flex-col gap-1">
+            <h2 className="font-display font-black text-3xl sm:text-4xl tracking-tight text-neutral-900">
+              Góc Setup AI Thiết Kế
             </h2>
-            <p className="text-neutral-500 text-sm sm:text-base max-w-2xl font-light">
-              Dựa trên hồ sơ của một <span className="text-neutral-900 font-semibold">{data.role}</span> làm việc <span className="text-neutral-900 font-semibold">{data.hours}h mỗi ngày</span>, phối hợp phong cách <span className="text-neutral-900 font-semibold">{data.style}</span> và sắc thái <span className="text-neutral-900 font-semibold">{data.color}</span>.
-            </p>
+            <div className="flex flex-wrap gap-2 text-xs text-neutral-500 font-medium">
+              <span>{data.role}</span>
+              <span>•</span>
+              <span>Style: {data.style}</span>
+              <span>•</span>
+              <span>Tone: {data.color}</span>
+            </div>
           </div>
 
-          <button
-            onClick={onRestart}
-            className="flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-sm px-8 py-4 rounded-full transition-all active:scale-95 shadow-md self-start md:self-auto cursor-pointer"
-          >
-            <span>Làm lại khảo sát</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsInWishlist(!isInWishlist)}
+              className={`p-3 rounded-full transition-all cursor-pointer ${isInWishlist ? "bg-red-50 text-red-500" : "bg-neutral-50 hover:bg-neutral-100 text-neutral-600"
+                }`}
+            >
+              <Heart size={16} weight={isInWishlist ? "fill" : "bold"} />
+            </button>
+
+            <button
+              onClick={handleShare}
+              className="p-3 rounded-full bg-neutral-50 hover:bg-neutral-100 text-neutral-600 transition-all cursor-pointer"
+            >
+              <ShareNetwork size={16} weight="bold" />
+            </button>
+
+            <button
+              onClick={onRestart}
+              className="bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-xs px-6 py-3 rounded-full transition-all active:scale-95 shadow-sm cursor-pointer"
+            >
+              Làm lại
+            </button>
+          </div>
         </div>
 
-        {/* TOP RECOMMENDED GRID BLOCK (Pinterest grid style but focused) */}
-        <div className="flex flex-col gap-6">
-          <div className="flex items-center gap-2">
+        {/* MAIN INTERACTIVE PREVIEW & PRODUCTS CARD */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
 
-            <h3 className="text-lg font-black text-neutral-900 uppercase tracking-wider">
-              Lựa chọn phù hợp nhất
-            </h3>
+          {/* Column Left: Visual Preview Container (5 cols, full bleed image) */}
+          <div className="lg:col-span-5 relative rounded-[24px] overflow-hidden min-h-[440px] shadow-sm bg-neutral-50 aspect-[4/3] lg:aspect-auto">
+            {/* Full-bleed Background Image */}
+            <img
+              src={previewMode === "concept" ? activeSuggestion.image : userPhotoUrl}
+              alt="Workspace Preview"
+              className="absolute inset-0 w-full h-full object-cover select-none"
+            />
+
+            {/* View Mode Switcher Header Overlay */}
+            <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-center">
+              <div className="flex bg-white/90 backdrop-blur-md p-1 rounded-full shadow-sm">
+                <button
+                  onClick={() => setPreviewMode("concept")}
+                  className={`text-[9px] sm:text-[10px] font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${previewMode === "concept" ? "bg-neutral-950 text-white" : "text-neutral-650 hover:text-neutral-950"
+                    }`}
+                >
+                  Bản thiết kế AI
+                </button>
+                <button
+                  onClick={() => setPreviewMode("before")}
+                  className={`text-[9px] sm:text-[10px] font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${previewMode === "before" ? "bg-neutral-950 text-white" : "text-neutral-650 hover:text-neutral-950"
+                    }`}
+                >
+                  Hiện trạng
+                </button>
+              </div>
+
+              {/* Minimalist circular Score badge */}
+              <div className="flex items-center gap-1 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-sm text-[10px] font-black text-neutral-800">
+                <span>Score: {finalScore}</span>
+              </div>
+            </div>
+
+            {/* Render Hotspots ONLY in Concept Mode (Flat dots, no ring animations, no text inside) */}
+            {previewMode === "concept" && activeSuggestion.hotspots.map((hotspot) => {
+              const isActive = selectedProductIds.includes(hotspot.id);
+              const isHovered = hoveredHotspotId === hotspot.id;
+
+              return (
+                <div
+                  key={hotspot.id}
+                  className="absolute"
+                  style={{ top: `${hotspot.top}%`, left: `${hotspot.left}%` }}
+                >
+                  <button
+                    onClick={() => toggleProduct(hotspot.id)}
+                    onMouseEnter={() => setHoveredHotspotId(hotspot.id)}
+                    onMouseLeave={() => setHoveredHotspotId(null)}
+                    className={`relative z-10 w-3 h-3 rounded-full transition-all shadow-md active:scale-90 cursor-pointer ${isActive ? "bg-neutral-950" : "bg-white"
+                      }`}
+                  />
+
+                  <AnimatePresence>
+                    {isHovered && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 w-40 bg-neutral-950/95 backdrop-blur-sm text-white p-2 rounded-lg shadow-lg flex flex-col gap-0.5 text-[9px]"
+                      >
+                        <span className="font-bold line-clamp-1">{hotspot.productName}</span>
+                        <span className="text-white/60">{hotspot.price.toLocaleString("vi-VN")}đ</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {topMatches.map((setup, idx) => (
-              <motion.div
-                key={setup.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="group relative bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-end aspect-[4/5] cursor-pointer"
-                onClick={() => setActiveSetup(setup)}
+          {/* Column Right: Suggested Products List (Using real shopify images and prices) */}
+          <div className="lg:col-span-7 flex flex-col justify-between gap-5">
+            <div className="flex flex-col gap-3">
+              <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest block mb-1">Thiết bị khuyên dùng</span>
+
+              <div className="flex flex-col gap-3 max-h-[340px] overflow-y-auto scrollbar-none pr-1">
+                {activeSuggestion.hotspots.map((product) => {
+                  const isSelected = selectedProductIds.includes(product.id);
+                  return (
+                    <div
+                      key={product.id}
+                      onClick={() => toggleProduct(product.id)}
+                      className={`bg-neutral-100 p-2.5 rounded-2xl flex items-center justify-between gap-4 transition-all duration-200 cursor-pointer ${isSelected
+                        ? "bg-neutral-100 opacity-100"
+                        : "opacity-30 bg-neutral-100"
+                        }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {/* Product Image (Full bleed / Edge-to-edge) */}
+                        <div className="w-14 h-14 bg-white rounded-xl overflow-hidden shrink-0">
+                          <img src={product.productImage} alt={product.productName} className="w-full h-full object-cover select-none" />
+
+                        </div>
+
+                        {/* Title & short match info */}
+                        <div className="flex flex-col gap-0.5">
+                          <h5 className="font-sans font-black text-xs sm:text-sm text-neutral-900 leading-tight">
+                            {product.productName}
+                          </h5>
+                          <span className="text-[9px] text-neutral-500 font-medium">
+                            {product.matchReason}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Buy Action and Price */}
+                      <div className="flex items-center gap-4 shrink-0" onClick={(e) => e.stopPropagation()}>
+                        <span className="font-sans font-black text-xs sm:text-sm text-neutral-900">
+                          {product.price.toLocaleString("vi-VN")}đ
+                        </span>
+
+                        <a
+                          href={product.buyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[9px] font-bold uppercase px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-850 text-white transition-all shadow-sm cursor-pointer border-0"
+                        >
+                          Mua
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Total Budget Calculator Card */}
+            <div className="bg-neutral-100 p-5 rounded-[24px] flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex flex-col">
+                <span className="text-xl font-display font-black text-neutral-900">
+                  {totalCost.toLocaleString("vi-VN")}đ
+                </span>
+
+                {/* Budget Limit Compare */}
+                <div className="mt-0.5 text-[9px] font-bold text-neutral-500">
+                  {totalCost <= data.budget * 1000000 ? (
+                    <span>Trong ngân sách ({data.budget}Mđ)</span>
+                  ) : (
+                    <span>Vượt ngân sách ({data.budget}Mđ)</span>
+                  )}
+                </div>
+              </div>
+
+              <button
+                onClick={() => alert("Đã thêm toàn bộ các sản phẩm đã kích hoạt vào giỏ hàng HyperWork!")}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-xs font-bold bg-neutral-950 hover:bg-neutral-900 text-white transition-all shadow-sm cursor-pointer border-0"
               >
-                {/* Image */}
-                <img
-                  src={setup.image}
-                  alt={setup.title}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 filter brightness-95"
-                />
+                <span>Mua trọn bộ đã chọn</span>
+              </button>
+            </div>
 
-                {/* Match Tag on top right */}
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full z-10 flex items-center gap-1 shadow-sm">
-                  <span className="text-[10px] font-bold text-neutral-900">{setup.matchScore}% tương thích</span>
-                </div>
-
-                {/* Ambient shade gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/5 opacity-85 group-hover:opacity-95 transition-opacity" />
-
-                {/* Text overlay info */}
-                <div className="relative z-10 p-6 flex flex-col gap-2 text-white">
-                  <span className="text-[9px] font-bold text-white/50 uppercase tracking-widest block">
-                    {setup.style} • {setup.color}
-                  </span>
-                  <h4 className="font-sans font-black text-xl tracking-tight leading-tight mb-1">
-                    {setup.title}
-                  </h4>
-                  <p className="text-white/70 text-xs sm:text-sm leading-relaxed line-clamp-2 font-light">
-                    {setup.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
           </div>
         </div>
 
         {/* PINTEREST MASONRY SECTION */}
-        <div className="flex flex-col gap-6 mt-6">
+        <div className="flex flex-col gap-4 mt-4">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-black text-neutral-900 uppercase tracking-wider">
+            <h3 className="font-black uppercase tracking-wider">
               Ý tưởng gợi ý thêm cho bạn
             </h3>
           </div>
 
-          {/* Pinterest Columns layout (No borders) */}
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-8 w-full">
-            {remainingMatches.map((setup) => (
-              <div
-                key={setup.id}
-                className={`break-inside-avoid mb-8 group relative bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-end ${setup.aspectRatio} cursor-pointer`}
-                onClick={() => setActiveSetup(setup)}
-              >
-                {/* Image */}
-                <img
-                  src={setup.image}
-                  alt={setup.title}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 filter brightness-95"
-                />
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 w-full">
+            {scoredSuggestions.map((setup) => {
+              const isActive = setup.id === activeSetupId;
+              return (
+                <div
+                  key={setup.id}
+                  className={`break-inside-avoid mb-6 group relative bg-white rounded-2xl overflow-hidden shadow-sm transition-all duration-300 flex flex-col justify-end ${setup.aspectRatio} cursor-pointer ${isActive ? "ring-2 ring-neutral-950 ring-offset-2" : ""
+                    }`}
+                  onClick={() => {
+                    setActiveSetupId(setup.id);
+                    setPreviewMode("concept");
+                  }}
+                >
+                  <img
+                    src={setup.image}
+                    alt={setup.title}
+                    className="absolute inset-0 w-full h-full object-cover filter brightness-95"
+                  />
 
-                {/* Match Tag on top right */}
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full z-10 flex items-center gap-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-[9px] font-bold text-neutral-800">{setup.matchScore}% Match</span>
+                  {/* Plain shadow gradient */}
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+
+                  {/* Text overlay */}
+                  <div className="relative z-10 p-5 flex flex-col gap-1 text-white">
+                    <span className="text-[8px] font-bold text-white/50 uppercase tracking-wider block">
+                      {setup.style}
+                    </span>
+                    <h4 className="font-sans font-black text-base tracking-tight leading-tight">
+                      {setup.title}
+                    </h4>
+                  </div>
                 </div>
-
-                {/* Ambient shade gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/5 opacity-80 group-hover:opacity-90 transition-opacity" />
-
-                {/* Text overlay info */}
-                <div className="relative z-10 p-6 flex flex-col gap-2 text-white">
-                  <span className="text-[9px] font-bold text-white/50 uppercase tracking-widest block">
-                    {setup.style} • {setup.color}
-                  </span>
-                  <h4 className="font-sans font-black text-lg sm:text-xl tracking-tight leading-tight mb-1">
-                    {setup.title}
-                  </h4>
-                  <p className="text-white/70 text-xs leading-relaxed line-clamp-2 font-light">
-                    {setup.description}
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
       </div>
-
-      {/* DETAILED LIGHTBOX MODAL (NO BORDERS) */}
-      <AnimatePresence>
-        {activeSetup && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 md:p-10"
-            onClick={() => setActiveSetup(null)}
-          >
-            {/* Modal Box (Borderless) */}
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              transition={{ type: "spring", stiffness: 220, damping: 25 }}
-              className="bg-white rounded-[32px] overflow-hidden max-w-4xl w-full flex flex-col md:flex-row shadow-2xl relative border-0"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Close Button */}
-              <button
-                onClick={() => setActiveSetup(null)}
-                className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-neutral-800 transition-all cursor-pointer border-0"
-              >
-                <X size={20} weight="bold" />
-              </button>
-
-              {/* Left: Image Container */}
-              <div className="w-full md:w-3/5 aspect-[4/3] md:aspect-auto md:min-h-[520px] relative bg-neutral-900 shrink-0">
-                <img
-                  src={activeSetup.image}
-                  alt={activeSetup.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Right: Description & Products (Borderless) */}
-              <div className="w-full md:w-2/5 p-8 flex flex-col justify-between gap-8 text-neutral-900">
-                <div className="flex flex-col gap-5">
-                  <div>
-                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1">
-                      {activeSetup.style} • {activeSetup.color}
-                    </span>
-                    <h3 className="font-sans font-black text-2xl tracking-tight leading-tight">
-                      {activeSetup.title}
-                    </h3>
-                  </div>
-
-                  <p className="text-neutral-500 text-xs sm:text-sm leading-relaxed font-light">
-                    {activeSetup.description}
-                  </p>
-
-                  <div className="pt-4 mt-2">
-                    <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-3">
-                      Cấu hình thiết bị gợi ý:
-                    </span>
-                    <div className="flex flex-col gap-2.5">
-                      {activeSetup.products.map((item, idx) => (
-                        <div key={idx} className="flex items-center gap-2.5 text-sm text-neutral-800 font-semibold">
-                          <CheckCircle size={16} weight="fill" className="text-neutral-800 shrink-0" />
-                          <span>{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Direct CTA & Price Info (Borderless) */}
-                <div className="flex flex-col gap-4 pt-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">Tổng chi phí ước tính</span>
-                      <span className="text-xl font-display font-black text-neutral-900 mt-0.5">
-                        {activeSetup.price.toLocaleString("vi-VN")} <span className="text-xs font-bold">VND</span>
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 text-[10px] text-neutral-500 font-bold bg-neutral-100 px-3 py-1.5 rounded-full">
-                      <ShieldCheck size={12} weight="fill" />
-                      <span>Chính hãng 100%</span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      alert(`Đã thêm trọn bộ ${activeSetup.title} vào giỏ hàng thành công!`);
-                      setActiveSetup(null);
-                    }}
-                    className="w-full bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-sm py-4 rounded-xl transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-2 cursor-pointer border-0"
-                  >
-                    <CreditCard size={18} weight="fill" />
-                    <span>Mua trọn bộ ngay</span>
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
