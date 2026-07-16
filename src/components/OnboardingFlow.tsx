@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
-  ArrowLeft,
   CloudArrowUp,
   Check,
   Shield,
@@ -250,7 +249,6 @@ export default function OnboardingFlow({ onBackToLanding, onComplete }: Onboardi
               onClick={prevStep}
               className="flex items-center gap-2 text-neutral-400 hover:text-neutral-900 text-xs font-bold tracking-wider uppercase cursor-pointer transition-colors duration-300"
             >
-              <ArrowLeft size={14} weight="bold" />
               <span className="hidden sm:inline">{currentStep === 1 ? "Thoát" : "Quay lại"}</span>
             </button>
             <div className="flex items-center gap-3 text-neutral-400">

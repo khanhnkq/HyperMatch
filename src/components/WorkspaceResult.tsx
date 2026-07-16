@@ -73,14 +73,14 @@ const translateRole = (role: string) => {
 
 const translateStyle = (style: string) => {
   const mapping: Record<string, string> = {
-    "Minimalist": "Tối giản Bắc Âu",
-    "Ergonomic": "Công thái học",
-    "Creator": "Lập trình & Tech",
-    "Cozy": "Ấm cúng cổ điển",
-    "Minimal": "Tối giản Bắc Âu",
-    "Modern": "Công thái học",
-    "Dark": "Lập trình & Tech",
-    "Wooden": "Ấm cúng cổ điển"
+    "Minimalist": "tối giản Bắc Âu",
+    "Ergonomic": "công thái học",
+    "Creator": "lập trình & Tech",
+    "Cozy": "ấm cúng cổ điển",
+    "Minimal": "tối giản Bắc Âu",
+    "Modern": "công thái học",
+    "Dark": "lập trình & Tech",
+    "Wooden": "ấm cúng cổ điển"
   };
   return mapping[style] || style;
 };
@@ -595,7 +595,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
     return {
       id: "ai_generated",
       image,
-      title: `Bản thiết kế AI tạo riêng cho bạn`,
+      title: `Setup AI tối ưu dành riêng cho bạn`,
       style: (data.style === "Minimal" ? "Minimalist" : data.style === "Wooden" ? "Cozy" : data.style === "Dark" ? "Creator" : "Ergonomic") as any,
       color: data.color as any,
       description: `Thiết kế tùy chỉnh tối ưu dựa trên sở thích và thói quen sử dụng của bạn.`,
@@ -692,7 +692,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
   };
 
   return (
-    <div className="w-full bg-white text-neutral-900 pt-28 pb-12 px-6 md:px-12 font-sans select-none relative">
+    <div className="w-full bg-white text-neutral-900 pt-28 pb-12 px-4 sm:px-6 md:px-10 font-sans select-none relative">
       {/* Share Toast */}
       <AnimatePresence>
         {showShareToast && (
@@ -708,7 +708,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
         )}
       </AnimatePresence>
 
-      <div className="max-w-7xl mx-auto flex flex-col gap-10">
+      <div className="max-w-full mx-auto flex flex-col gap-10">
 
         {/* HEADER BLOCK (CLEAN & SIMPLE) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
@@ -716,15 +716,16 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
 
 
             <h2 className="font-display font-black text-3xl sm:text-4xl tracking-tight text-neutral-900">
-              {activeSetupId === "ai_generated" ? "Bản thiết kế AI" : "Bản thiết kế gợi ý"}
+              {activeSetupId === "ai_generated" ? "Setup AI dành riêng cho bạn" : "Setup HyperWork gợi ý"}
             </h2>
-            <div className="flex flex-wrap gap-2 text-xs text-neutral-500 font-medium">
+            <div className="font-sans font-semibold text-[14px] md:text-[16px] text-neutral-500  tracking-wide">
               <span>{translateRole(data.role)}</span>
-              <span>-</span>
-              <span>Phong cách: {translateStyle(activeSuggestion.style)}</span>
-              <span>-</span>
-              <span>Tone màu: {translateColor(activeSuggestion.color)}</span>
+              <span> - </span>
+              <span>Phong cách {translateStyle(activeSuggestion.style)}</span>
+              <span> - </span>
+              <span>Tone màu {translateColor(activeSuggestion.color)}</span>
             </div>
+
             {activeSetupId === "ai_generated" ? (
               <></>
             ) : (
@@ -734,9 +735,9 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                     setActiveSetupId("ai_generated");
                     setPreviewMode("concept");
                   }}
-                  className="text-[9px] font-black text-neutral-900  hover:opacity-85 cursor-pointer uppercase tracking-wider"
+                  className="font-sans font-semibold text-[14px] md:text-[16px] text-neutral-900  tracking-wide"
                 >
-                  Quay lại thiết kế của bạn
+                  Quay lại setup của bạn
                 </button>
               </div>
             )}
@@ -780,7 +781,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                 alt="Workspace Preview"
                 className="w-full h-full object-cover select-none"
               />
-              
+
               {/* Bottom-left gradient overlay (inside image clip box) */}
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
             </div>
@@ -792,7 +793,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                 className={`text-[9px] sm:text-[10px] font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${previewMode === "concept" ? "text-neutral-650 hover:text-neutral-950" : "text-neutral-500"
                   }`}
               >
-                {activeSetupId === "ai_generated" ? "Bản thiết kế AI" : "Bản thiết kế gợi ý"}
+                {activeSetupId === "ai_generated" ? "Setup AI" : "Setup gợi ý"}
               </button>
               <button
                 onClick={() => setPreviewMode("before")}
@@ -802,7 +803,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                 Hiện trạng
               </button>
             </div>
-            
+
             {/* Text details bottom-left (placed on top of image, outside overflow-hidden) */}
             <div className="absolute bottom-4 left-4 z-20 flex flex-col gap-0.5 text-white pr-4 pointer-events-none">
               <span className="text-[8px] font-bold text-white/50 uppercase tracking-widest block">
@@ -850,10 +851,10 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                       >
                         {/* Gray Image Box (Full Bleed) */}
                         <div className="w-full aspect-square bg-[#f5f5f5] rounded-[18px] overflow-hidden mb-2">
-                          <img 
-                            src={hotspot.productImage} 
-                            alt={hotspot.productName} 
-                            className="w-full h-full object-cover select-none" 
+                          <img
+                            src={hotspot.productImage}
+                            alt={hotspot.productName}
+                            className="w-full h-full object-cover select-none"
                           />
                         </div>
 
@@ -882,7 +883,6 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
           {/* Column Right: Suggested Products List (Using real shopify images and prices) */}
           <div className="lg:col-span-7 flex flex-col justify-between gap-5">
             <div className="flex flex-col gap-3">
-              <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest block mb-1">Thiết bị khuyên dùng</span>
 
               <div className="flex flex-col gap-3 max-h-[340px] overflow-y-auto scrollbar-none pr-1">
                 {activeSuggestion.hotspots.map((product) => {
@@ -964,10 +964,13 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
 
         {/* PINTEREST MASONRY SECTION */}
         <div className="flex flex-col gap-4 mt-4">
-          <div className="flex items-center gap-2">
-            <h3 className="font-black uppercase tracking-wider text-xs text-neutral-400">
-              Ý tưởng gợi ý thêm cho bạn (Pinterest)
-            </h3>
+          <div className="flex flex-col gap-1.5 items-start ">
+            <h2 className="font-display font-black text-3xl sm:text-4xl tracking-tight text-neutral-900">
+              Setup cùng HyperWork
+            </h2>
+            <span className="font-sans font-semibold text-[14px] md:text-[16px] text-neutral-500  tracking-wide">
+              Khám phá các góc setup làm việc từ nhiều không gian khác nhau phù hợp với bạn, bao gồm những setup mới inhouse và chia sẻ từ KOL, KOC & Creator. Toàn bộ hình ảnh đều được xây dựng với các sản phẩm của HyperWork.
+            </span>
           </div>
 
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 w-full">

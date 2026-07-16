@@ -30,7 +30,7 @@ export default function ProductCategories() {
 
         {/* Header */}
         <div className="flex flex-col gap-1">
-          <span className="font-sans font-semibold text-[14px] md:text-[16px] text-neutral-500 uppercase tracking-wide">
+          <span className="font-sans font-semibold text-[14px] md:text-[16px] text-neutral-500  tracking-wide">
             Chúng tôi có gì?
           </span>
           <h2 className="font-display font-black text-3xl md:text-4xl text-neutral-900 tracking-tight">
