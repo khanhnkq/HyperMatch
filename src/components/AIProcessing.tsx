@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "motion/react";
-import { Sparkle, ArrowRight } from "@phosphor-icons/react";
 
 function CarouselCard({ prod, index, x, viewportWidth }: { prod: any, index: number, x: any, viewportWidth: number }) {
   // Center of the current card relative to the start of the track (x=0)
@@ -95,7 +94,6 @@ const CAROUSEL_PRODUCTS = [
 const cardWidth = 304; // 288px width + 16px gap
 
 export default function AIProcessing({ onFinished }: AIProcessingProps) {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isExpanding, setIsExpanding] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(1000);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -133,51 +131,48 @@ export default function AIProcessing({ onFinished }: AIProcessingProps) {
       repeat: Infinity,
     });
 
+    let step = 0;
     // Dynamic step increments (takes ~6 seconds total)
     const interval = setInterval(() => {
-      setCurrentStepIndex((prev) => {
-        if (prev < THINKING_STEPS.length - 1) {
-          return prev + 1;
-        } else {
-          clearInterval(interval);
+      if (step < THINKING_STEPS.length - 1) {
+        step++;
+      } else {
+        clearInterval(interval);
 
-          // Stop continuous marquee
-          xAnim.stop();
+        // Stop continuous marquee
+        xAnim.stop();
 
-          // Calculate current track X and find nearest Ghế index (i % 4 === 3)
-          const currentX = x.get();
-          let targetX = 0;
-          let minDistance = Infinity;
+        // Calculate current track X and find nearest Ghế index (i % 4 === 3)
+        const currentX = x.get();
+        let targetX = 0;
+        let minDistance = Infinity;
 
-          for (let i = 3; i < 24; i += 4) {
-            const cardCenter = i * 304 + 152;
-            const x_center = viewportWidth / 2 - cardCenter;
-            const dist = Math.abs(currentX - x_center);
-            if (dist < minDistance) {
-              minDistance = dist;
-              targetX = x_center;
-            }
+        for (let i = 3; i < 24; i += 4) {
+          const cardCenter = i * 304 + 152;
+          const x_center = viewportWidth / 2 - cardCenter;
+          const dist = Math.abs(currentX - x_center);
+          if (dist < minDistance) {
+            minDistance = dist;
+            targetX = x_center;
           }
-
-          // Smoothly snap the closest Ghế card to the center
-          animate(x, targetX, {
-            type: "spring",
-            stiffness: 180,
-            damping: 20,
-            onComplete: () => {
-              // Wait 150ms for snapping animation to fully settle, then expand
-              setTimeout(() => {
-                setIsExpanding(true);
-                setTimeout(() => {
-                  onFinished();
-                }, 1100);
-              }, 150);
-            }
-          });
-
-          return prev;
         }
-      });
+
+        // Smoothly snap the closest Ghế card to the center
+        animate(x, targetX, {
+          type: "spring",
+          stiffness: 180,
+          damping: 20,
+          onComplete: () => {
+            // Wait 150ms for snapping animation to fully settle, then expand
+            setTimeout(() => {
+              setIsExpanding(true);
+              setTimeout(() => {
+                onFinished();
+              }, 1100);
+            }, 150);
+          }
+        });
+      }
     }, 600);
 
     return () => {
@@ -187,7 +182,6 @@ export default function AIProcessing({ onFinished }: AIProcessingProps) {
     };
   }, [viewportWidth]);
 
-  const progressPercent = ((currentStepIndex + 1) / THINKING_STEPS.length) * 100;
 
   return (
     <div className="w-full min-h-[100dvh] bg-[#f5f5f7] flex items-center justify-center relative overflow-hidden font-sans select-none">

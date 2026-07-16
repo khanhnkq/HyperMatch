@@ -2,7 +2,6 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ArrowLeft,
-  ArrowRight,
   CloudArrowUp,
   Check,
   Shield,
@@ -193,7 +192,6 @@ export default function OnboardingFlow({ onBackToLanding, onComplete }: Onboardi
     }
   };
 
-  const progressPercent = (currentStep / STEPS_COUNT) * 100;
 
   const slideVariants = {
     enter: (dir: number) => ({

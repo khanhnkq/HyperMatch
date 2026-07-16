@@ -1,5 +1,4 @@
 import { motion } from "motion/react";
-import { Sparkle, Camera } from "@phosphor-icons/react";
 
 interface AIAdvisorIntroProps {
   onStartAdvisor: () => void;
