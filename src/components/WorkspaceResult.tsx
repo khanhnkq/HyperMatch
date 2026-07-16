@@ -3,7 +3,9 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Heart,
   ShareNetwork,
-  CheckCircle
+  CheckCircle,
+  Plus,
+  Check
 } from "@phosphor-icons/react";
 import productsData from "../data/products.json";
 
@@ -56,6 +58,55 @@ function findRealProduct(keyword: string, fallbackName: string, fallbackPrice: n
     buyUrl: fallbackUrl
   };
 }
+const translateRole = (role: string) => {
+  const mapping: Record<string, string> = {
+    "Software Engineer": "Kỹ sư phần mềm",
+    "Designer": "Nhà thiết kế",
+    "Student": "Sinh viên",
+    "Content Creator": "Sáng tạo nội dung",
+    "Remote Worker": "Làm việc từ xa",
+    "Gamer": "Game thủ",
+    "Other": "Khác"
+  };
+  return mapping[role] || role;
+};
+
+const translateStyle = (style: string) => {
+  const mapping: Record<string, string> = {
+    "Minimalist": "Tối giản Bắc Âu",
+    "Ergonomic": "Công thái học",
+    "Creator": "Lập trình & Tech",
+    "Cozy": "Ấm cúng cổ điển",
+    "Minimal": "Tối giản Bắc Âu",
+    "Modern": "Công thái học",
+    "Dark": "Lập trình & Tech",
+    "Wooden": "Ấm cúng cổ điển"
+  };
+  return mapping[style] || style;
+};
+
+const translateColor = (color: string) => {
+  const mapping: Record<string, string> = {
+    "White": "Trắng",
+    "Black": "Đen",
+    "Walnut": "Gỗ Walnut",
+  };
+  return mapping[color] || color;
+};
+
+const translateCategory = (cat: string) => {
+  const mapping: Record<string, string> = {
+    "Ergonomic Chair": "Ghế công thái học",
+    "Monitor Arm": "Giá đỡ màn hình",
+    "Keyboard": "Bàn phím cơ",
+    "Smart Desk": "Bàn nâng hạ thông minh",
+    "Light": "Đèn treo màn hình",
+    "Accessories": "Phụ kiện setup",
+    "Organizer": "Kệ màn hình",
+  };
+  return mapping[cat] || cat;
+};
+
 
 const SETUP_SUGGESTIONS_RAW = [
   {
@@ -665,14 +716,14 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
 
 
             <h2 className="font-display font-black text-3xl sm:text-4xl tracking-tight text-neutral-900">
-              {activeSuggestion.title}
+              {activeSetupId === "ai_generated" ? "Bản thiết kế AI" : "Bản thiết kế gợi ý"}
             </h2>
             <div className="flex flex-wrap gap-2 text-xs text-neutral-500 font-medium">
-              <span>{data.role}</span>
-              <span>•</span>
-              <span>Style: {activeSuggestion.style}</span>
-              <span>•</span>
-              <span>Tone: {activeSuggestion.color}</span>
+              <span>{translateRole(data.role)}</span>
+              <span>-</span>
+              <span>Phong cách: {translateStyle(activeSuggestion.style)}</span>
+              <span>-</span>
+              <span>Tone màu: {translateColor(activeSuggestion.color)}</span>
             </div>
             {activeSetupId === "ai_generated" ? (
               <></>
@@ -720,39 +771,46 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
         {/* MAIN INTERACTIVE PREVIEW & PRODUCTS CARD */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
 
-          {/* Column Left: Visual Preview Container (5 cols, full bleed image) */}
-          <div className="lg:col-span-5 relative rounded-[24px] overflow-hidden min-h-[440px] shadow-sm bg-neutral-50 aspect-[4/3] lg:aspect-auto">
-            {/* Full-bleed Background Image */}
-            <img
-              src={previewMode === "concept" ? activeSuggestion.image : userPhotoUrl}
-              alt="Workspace Preview"
-              className="absolute inset-0 w-full h-full object-cover select-none"
-            />
+          {/* Column Left: Visual Preview Container (5 cols) */}
+          <div className="lg:col-span-5 relative min-h-[440px] aspect-[4/3] lg:aspect-auto">
+            {/* Full-bleed Background Image with rounded corners and overflow hidden (clipping bounds) */}
+            <div className="absolute inset-0 rounded-[24px] overflow-hidden shadow-sm bg-neutral-50">
+              <img
+                src={previewMode === "concept" ? activeSuggestion.image : userPhotoUrl}
+                alt="Workspace Preview"
+                className="w-full h-full object-cover select-none"
+              />
+              
+              {/* Bottom-left gradient overlay (inside image clip box) */}
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+            </div>
 
-            {/* View Mode Switcher Header Overlay */}
-            <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-center">
-              <div className="flex bg-white p-0.5 rounded-full">
-                <button
-                  onClick={() => setPreviewMode("concept")}
-                  className={`text-[9px] sm:text-[10px] font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${previewMode === "concept" ? "text-neutral-650 hover:text-neutral-950" : "text-neutral-500"
-                    }`}
-                >
-                  Bản thiết kế AI
-                </button>
-                <span>|</span>
-                <button
-                  onClick={() => setPreviewMode("before")}
-                  className={`text-[9px] sm:text-[10px] font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${previewMode === "before" ? "text-neutral-650 hover:text-neutral-950" : "text-neutral-500"
-                    }`}
-                >
-                  Hiện trạng
-                </button>
-              </div>
-
-              {/* Minimalist circular Score badge */}
-              <div className="flex items-center gap-1 bg-white px-3.5 py-1.5 rounded-full text-[10px] font-black text-neutral-800">
-                <span>Độ phù hợp: {finalScore}</span>
-              </div>
+            {/* View Mode Switcher Overlay (Top-Left corner) */}
+            <div className="absolute top-4 left-4 z-20 flex bg-white p-0.5 rounded-full shadow-sm">
+              <button
+                onClick={() => setPreviewMode("concept")}
+                className={`text-[9px] sm:text-[10px] font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${previewMode === "concept" ? "text-neutral-650 hover:text-neutral-950" : "text-neutral-500"
+                  }`}
+              >
+                {activeSetupId === "ai_generated" ? "Bản thiết kế AI" : "Bản thiết kế gợi ý"}
+              </button>
+              <button
+                onClick={() => setPreviewMode("before")}
+                className={`text-[9px] sm:text-[10px] font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${previewMode === "before" ? "text-neutral-650 hover:text-neutral-950" : "text-neutral-500"
+                  }`}
+              >
+                Hiện trạng
+              </button>
+            </div>
+            
+            {/* Text details bottom-left (placed on top of image, outside overflow-hidden) */}
+            <div className="absolute bottom-4 left-4 z-20 flex flex-col gap-0.5 text-white pr-4 pointer-events-none">
+              <span className="text-[8px] font-bold text-white/50 uppercase tracking-widest block">
+                Độ phù hợp: {finalScore}%
+              </span>
+              <h4 className="font-sans font-black text-base sm:text-lg tracking-tight leading-tight">
+                {activeSuggestion.title}
+              </h4>
             </div>
 
             {/* Render Hotspots ONLY in Concept Mode (Flat dots, no ring animations, no text inside) */}
@@ -763,27 +821,56 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
               return (
                 <div
                   key={hotspot.id}
-                  className="absolute"
+                  className={`absolute -translate-x-1/2 -translate-y-1/2 transition-all ${isHovered ? "z-30" : "z-10"}`}
                   style={{ top: `${hotspot.top}%`, left: `${hotspot.left}%` }}
                 >
                   <button
                     onClick={() => toggleProduct(hotspot.id)}
                     onMouseEnter={() => setHoveredHotspotId(hotspot.id)}
                     onMouseLeave={() => setHoveredHotspotId(null)}
-                    className={`relative z-10 w-3 h-3 rounded-full transition-all shadow-md active:scale-90 cursor-pointer ${isActive ? "bg-neutral-950" : "bg-white"
-                      }`}
-                  />
+                    className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-[2px] flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-sm border-0 p-0"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-md text-neutral-900 transition-colors">
+                      {isActive ? (
+                        <Check size={12} weight="bold" />
+                      ) : (
+                        <Plus size={12} weight="bold" />
+                      )}
+                    </div>
+                  </button>
 
                   <AnimatePresence>
                     {isHovered && (
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -4 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 w-40 bg-neutral-950/95 backdrop-blur-sm text-white p-2 rounded-lg shadow-lg flex flex-col gap-0.5 text-[9px]"
+                        initial={{ opacity: 0, scale: 0.9, x: -10, y: "-50%" }}
+                        animate={{ opacity: 1, scale: 1, x: 0, y: "-50%" }}
+                        exit={{ opacity: 0, scale: 0.9, x: -10, y: "-50%" }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute left-14 top-1/2 z-30 w-52 bg-white p-3.5 rounded-[24px] shadow-2xl flex flex-col text-left text-neutral-900 border border-neutral-50"
                       >
-                        <span className="font-bold line-clamp-1">{hotspot.productName}</span>
-                        <span className="text-white/60">{hotspot.price.toLocaleString("vi-VN")}đ</span>
+                        {/* Gray Image Box (Full Bleed) */}
+                        <div className="w-full aspect-square bg-[#f5f5f5] rounded-[18px] overflow-hidden mb-2">
+                          <img 
+                            src={hotspot.productImage} 
+                            alt={hotspot.productName} 
+                            className="w-full h-full object-cover select-none" 
+                          />
+                        </div>
+
+                        {/* Category */}
+                        <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-wider block mb-0.5">
+                          {translateCategory(hotspot.productCategory)}
+                        </span>
+
+                        {/* Title */}
+                        <h5 className="font-sans font-black text-xs text-neutral-900 leading-snug line-clamp-2">
+                          {hotspot.productName}
+                        </h5>
+
+                        {/* Price */}
+                        <span className="text-[11px] text-neutral-500 font-extrabold mt-1">
+                          {hotspot.price.toLocaleString("vi-VN")}
+                        </span>
                       </motion.div>
                     )}
                   </AnimatePresence>
