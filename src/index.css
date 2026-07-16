@@ -35,8 +35,8 @@
   --font-display: "Poppins-Klaviyo-Hosted", "Poppins", system-ui, sans-serif;
   --font-accent: "Manrope", system-ui, sans-serif;
 
-  --color-brand-red: #ef4444;
-  --color-brand-red-dark: #b91c1c;
+  --color-brand-accent: #18181B;
+  --color-brand-accent-soft: #27272A;
   --color-brand-blue: #3b82f6;
   --color-brand-dark: #0b0b0c;
   --color-brand-dark-card: #141416;
@@ -62,7 +62,7 @@
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-brand-red);
+  background: var(--color-brand-accent);
 }
 
 /* Smooth Scrolling */
@@ -73,10 +73,10 @@ html {
 /* Custom Glow Animations */
 @keyframes pulseGlow {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 15px rgba(24, 24, 27, 0.3);
   }
   50% {
-    box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 25px rgba(24, 24, 27, 0.6);
   }
 }
 
@@ -107,3 +107,20 @@ html {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Endless sliding marquee */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.33%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+}
+

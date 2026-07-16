@@ -3,6 +3,15 @@ import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 
 const slides = [
   {
+    id: 5,
+    image: "https://hyperwork.vn/cdn/shop/files/HPWT93781_11zon.jpg?v=1760322746&width=2800",
+    kicker: "AI Workspace Advisor",
+    heading: "Build Your Perfect Workspace",
+    caption: "Trả lời vài câu hỏi đơn giản, AI sẽ phân tích và đề xuất setup workspace phù hợp nhất.",
+    buttonText: "Bắt đầu ngay",
+    buttonLink: "#",
+  },
+  {
     id: 1,
     image: "https://hyperwork.vn/cdn/shop/files/DSC08799_11zon.jpg?v=1760324549&width=2800",
     kicker: "Giải pháp tiết kiệm",
@@ -40,7 +49,11 @@ const slides = [
   }
 ];
 
-export default function PromoBanners() {
+interface PromoBannersProps {
+  onStartAdvisor?: () => void;
+}
+
+export default function PromoBanners({ onStartAdvisor }: PromoBannersProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,9 +62,9 @@ export default function PromoBanners() {
 
     // We use a slight timeout to ensure DOM layout is fully painted before calculating widths
     setTimeout(() => {
-      if (container.children.length < 12) return;
-      const setWidth = (container.children[4] as HTMLElement).offsetLeft - (container.children[0] as HTMLElement).offsetLeft;
-      
+      if (container.children.length < slides.length * 3) return;
+      const setWidth = (container.children[slides.length] as HTMLElement).offsetLeft - (container.children[0] as HTMLElement).offsetLeft;
+
       // Calculate offset to perfectly center the slide (25% on desktop, 17% on mobile)
       const offset = (container.clientWidth - (container.children[0] as HTMLElement).offsetWidth) / 2;
       container.scrollLeft = setWidth + offset + 4;
@@ -63,7 +76,7 @@ export default function PromoBanners() {
     const startAutoScroll = () => {
       intervalId = setInterval(() => {
         if (!container) return;
-        const setWidth = (container.children[4] as HTMLElement).offsetLeft - (container.children[0] as HTMLElement).offsetLeft;
+        const setWidth = (container.children[slides.length] as HTMLElement).offsetLeft - (container.children[0] as HTMLElement).offsetLeft;
 
         // Warp silently if near the right boundary
         if (container.scrollLeft > setWidth * 1.8) {
@@ -85,8 +98,8 @@ export default function PromoBanners() {
     const handleScroll = () => {
       clearTimeout(isScrolling);
       isScrolling = setTimeout(() => {
-        if (container.children.length < 12) return;
-        const setWidth = (container.children[4] as HTMLElement).offsetLeft - (container.children[0] as HTMLElement).offsetLeft;
+        if (container.children.length < slides.length * 3) return;
+        const setWidth = (container.children[slides.length] as HTMLElement).offsetLeft - (container.children[0] as HTMLElement).offsetLeft;
 
         if (container.scrollLeft > setWidth * 1.8) {
           container.scrollLeft -= setWidth;
@@ -117,7 +130,7 @@ export default function PromoBanners() {
   const scrollLeftAction = () => {
     const container = carouselRef.current;
     if (!container) return;
-    const setWidth = (container.children[4] as HTMLElement).offsetLeft - (container.children[0] as HTMLElement).offsetLeft;
+    const setWidth = (container.children[slides.length] as HTMLElement).offsetLeft - (container.children[0] as HTMLElement).offsetLeft;
 
     if (container.scrollLeft < setWidth * 0.8) {
       container.scrollLeft += setWidth;
@@ -132,7 +145,7 @@ export default function PromoBanners() {
   const scrollRightAction = () => {
     const container = carouselRef.current;
     if (!container) return;
-    const setWidth = (container.children[4] as HTMLElement).offsetLeft - (container.children[0] as HTMLElement).offsetLeft;
+    const setWidth = (container.children[slides.length] as HTMLElement).offsetLeft - (container.children[0] as HTMLElement).offsetLeft;
 
     if (container.scrollLeft > setWidth * 1.8) {
       container.scrollLeft -= setWidth;
@@ -168,45 +181,50 @@ export default function PromoBanners() {
         style={{ scrollSnapType: "x mandatory" }}
       >
         {/* Render exactly 3 sets for standard infinite seamless looping */}
-        <CardSet />
-        <CardSet />
-        <CardSet />
+        <CardSet onStartAdvisor={onStartAdvisor} />
+        <CardSet onStartAdvisor={onStartAdvisor} />
+        <CardSet onStartAdvisor={onStartAdvisor} />
       </div>
     </section>
   );
 }
 
 // Extracted CardSet component representing one full sequence of promotional cards
-const CardSet = () => (
+const CardSet = ({ onStartAdvisor }: { onStartAdvisor?: () => void }) => (
   <>
     {slides.map((slide, index) => (
-      <div 
+      <div
         key={`${slide.id}-${index}`}
-        className="relative flex-shrink-0 snap-center rounded-sm overflow-hidden w-[100vw] md:w-[calc(50vw-12px)] aspect-[2/3] md:aspect-[3/2] cursor-pointer group"
+        className="relative flex-shrink-0 snap-center overflow-hidden w-[100vw] md:w-[calc(50vw-12px)] aspect-[2/3] md:aspect-[3/2] cursor-pointer group"
       >
-        <img 
-          src={slide.image} 
-          alt={slide.heading || "Promo"} 
+        <img
+          src={slide.image}
+          alt={slide.heading || "Promo"}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-95"
         />
-        
+
         {/* Overlay Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-90 pointer-events-none" />
-        
+        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20 sm:from-black/80 sm:via-black/40 sm:to-transparent" />
+
         {/* Content */}
         <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-14 text-white z-10 pointer-events-none">
           {slide.kicker && <span className="text-[11px] font-bold text-white/80 uppercase tracking-widest mb-1">{slide.kicker}</span>}
           {slide.heading && <h4 className="font-display font-black text-2xl md:text-3xl text-white mt-1 mb-2">{slide.heading}</h4>}
           {slide.caption && <span className="text-[12px] text-white/90 font-medium mb-3">{slide.caption}</span>}
-          
+
           <div className="mt-1 pointer-events-auto w-fit">
-            <a 
+            <a
               href={slide.buttonLink}
               target="_blank"
               rel="noreferrer"
               className="bg-white text-black hover:bg-neutral-200 text-xs font-bold px-8 py-3 rounded-full transition-colors duration-200 cursor-pointer shadow-md inline-block active:scale-98"
               onClick={(e) => {
-                if (slide.buttonLink === "#") e.preventDefault();
+                if (slide.id === 5 && onStartAdvisor) {
+                  e.preventDefault();
+                  onStartAdvisor();
+                } else if (slide.buttonLink === "#") {
+                  e.preventDefault();
+                }
                 e.stopPropagation();
               }}
             >

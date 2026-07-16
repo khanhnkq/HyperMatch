@@ -264,10 +264,10 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
         
         {/* SECTION 1: HEADER & STATS */}
         <div className="flex flex-col lg:flex-row items-center justify-between gap-10 bg-neutral-50 border border-neutral-250 p-8 md:p-12 rounded-brand-card relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-[radial-gradient(circle_at_top_right,rgba(255,0,0,0.02)_0%,transparent_60%)] pointer-events-none" />
+          <div className="absolute top-0 right-0 w-80 h-80 bg-[radial-gradient(circle_at_top_right,rgba(24,24,27,0.02)_0%,transparent_60%)] pointer-events-none" />
           
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left gap-4 max-w-xl">
-            <div className="flex items-center gap-1.5 text-brand-red font-sans text-[10px] font-bold tracking-widest uppercase">
+            <div className="flex items-center gap-1.5 text-brand-accent font-sans text-[10px] font-bold tracking-widest uppercase">
               <Sparkle size={12} weight="fill" />
               <span>Workspace Advisor Analysis</span>
             </div>
@@ -304,7 +304,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                   cx="64"
                   cy="64"
                   r="54"
-                  className="stroke-brand-red fill-transparent"
+                  className="stroke-brand-accent fill-transparent"
                   strokeWidth="8"
                   strokeDasharray={339.29}
                   initial={{ strokeDashoffset: 339.29 }}
@@ -334,16 +334,16 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-neutral-50 border border-neutral-250 p-8 rounded-brand-card">
             <div className="flex items-center gap-2 mb-6">
-              <Warning size={20} className="text-brand-red animate-pulse" />
+              <Warning size={20} className="text-brand-accent animate-pulse" />
               <h3 className="font-display font-bold text-xl text-neutral-900">Detected Risks & Issues</h3>
             </div>
             
             <div className="flex flex-col gap-4">
               {data.problems.includes("Neck pain") && (
-                <div className="flex gap-4 p-4 rounded-xl bg-brand-red/5 border border-brand-red/10">
-                  <div className="w-1.5 h-1.5 rounded-full bg-brand-red mt-1.5 shrink-0" />
+                <div className="flex gap-4 p-4 rounded-xl bg-brand-accent/5 border border-brand-accent/10">
+                  <div className="w-1.5 h-1.5 rounded-full bg-brand-accent mt-1.5 shrink-0" />
                   <div>
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-brand-red">Monitor Level Too Low</h5>
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-brand-accent">Monitor Level Too Low</h5>
                     <p className="text-neutral-600 text-xs leading-relaxed mt-1">
                       Forces forward head posture (text neck), loading up to 27kg of extra strain on your cervical spine.
                     </p>
@@ -351,10 +351,10 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                 </div>
               )}
               {data.problems.includes("Back pain") && (
-                <div className="flex gap-4 p-4 rounded-xl bg-brand-red/5 border border-brand-red/10">
-                  <div className="w-1.5 h-1.5 rounded-full bg-brand-red mt-1.5 shrink-0" />
+                <div className="flex gap-4 p-4 rounded-xl bg-brand-accent/5 border border-brand-accent/10">
+                  <div className="w-1.5 h-1.5 rounded-full bg-brand-accent mt-1.5 shrink-0" />
                   <div>
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-brand-red">Inadequate Lumbar Support</h5>
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-brand-accent">Inadequate Lumbar Support</h5>
                     <p className="text-neutral-600 text-xs leading-relaxed mt-1">
                       Continuous sitting without proper lumbar curve support flattens spinal curvature, generating lower back ache.
                     </p>
@@ -362,10 +362,10 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                 </div>
               )}
               {data.problems.includes("Cable clutter") && (
-                <div className="flex gap-4 p-4 rounded-xl bg-brand-red/5 border border-brand-red/10">
-                  <div className="w-1.5 h-1.5 rounded-full bg-brand-red mt-1.5 shrink-0" />
+                <div className="flex gap-4 p-4 rounded-xl bg-brand-accent/5 border border-brand-accent/10">
+                  <div className="w-1.5 h-1.5 rounded-full bg-brand-accent mt-1.5 shrink-0" />
                   <div>
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-brand-red">High Visual Noise (Cables)</h5>
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-brand-accent">High Visual Noise (Cables)</h5>
                     <p className="text-neutral-600 text-xs leading-relaxed mt-1">
                       Visible cable mess leads to sensory overload and drops daily focus levels by roughly 12-15%.
                     </p>
@@ -374,7 +374,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
               )}
               {data.problems.length === 0 && (
                 <div className="flex gap-4 p-4 rounded-xl bg-white border border-neutral-200">
-                  <div className="w-1.5 h-1.5 rounded-full bg-brand-red mt-1.5 shrink-0" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-brand-accent mt-1.5 shrink-0" />
                   <div>
                     <h5 className="text-xs font-bold uppercase tracking-wider text-neutral-900">General Posture Strain</h5>
                     <p className="text-neutral-650 text-xs leading-relaxed mt-1">
@@ -388,13 +388,13 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
 
           <div className="bg-neutral-50 border border-neutral-250 p-8 rounded-brand-card">
             <div className="flex items-center gap-2 mb-6">
-              <Lightbulb size={20} className="text-brand-red" />
+              <Lightbulb size={20} className="text-brand-accent" />
               <h3 className="font-display font-bold text-xl text-neutral-900">Suggested Posture Tweaks</h3>
             </div>
             
             <div className="flex flex-col gap-4 text-xs">
               <div className="flex gap-4 p-4 rounded-xl border border-neutral-200 bg-white">
-                <span className="text-brand-red font-bold font-mono">01</span>
+                <span className="text-brand-accent font-bold font-mono">01</span>
                 <div>
                   <h5 className="font-bold uppercase tracking-wider text-neutral-900">The 90-90-90 Rule</h5>
                   <p className="text-neutral-650 mt-1 leading-relaxed">
@@ -404,7 +404,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
               </div>
               
               <div className="flex gap-4 p-4 rounded-xl border border-neutral-200 bg-white">
-                <span className="text-brand-red font-bold font-mono">02</span>
+                <span className="text-brand-accent font-bold font-mono">02</span>
                 <div>
                   <h5 className="font-bold uppercase tracking-wider text-neutral-900">Screen Distancing</h5>
                   <p className="text-neutral-655 mt-1 leading-relaxed">
@@ -414,7 +414,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
               </div>
 
               <div className="flex gap-4 p-4 rounded-xl border border-neutral-200 bg-white">
-                <span className="text-brand-red font-bold font-mono">03</span>
+                <span className="text-brand-accent font-bold font-mono">03</span>
                 <div>
                   <h5 className="font-bold uppercase tracking-wider text-neutral-900">Dynamic Transitions</h5>
                   <p className="text-neutral-655 mt-1 leading-relaxed">
@@ -437,7 +437,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
             </div>
             <div className="flex items-center gap-1.5 bg-white border border-neutral-200 px-4 py-2.5 rounded-lg shadow-sm">
               <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Est. Cost:</span>
-              <span className="font-display font-extrabold text-lg text-brand-red flex items-center">
+              <span className="font-display font-extrabold text-lg text-brand-accent flex items-center">
                 {totalPrice.toLocaleString("vi-VN")} <span className="text-xs ml-1 text-neutral-500">VND</span>
               </span>
             </div>
@@ -453,7 +453,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
               max="30"
               value={budgetLimit}
               onChange={e => setBudgetLimit(parseInt(e.target.value))}
-              className="w-full h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-brand-red mt-2"
+              className="w-full h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-brand-accent mt-2"
             />
             <div className="flex justify-between w-full text-[10px] font-bold text-neutral-500 uppercase px-1">
               <span>5M VND</span>
@@ -477,10 +477,10 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
 
             {/* Virtual Desk Canvas */}
             <div className="relative flex-grow flex items-center justify-center min-h-[220px] my-6 bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-inner">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,0,0,0.01)_0%,transparent_60%)] pointer-events-none" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(24,24,27,0.01)_0%,transparent_60%)] pointer-events-none" />
               
               {/* Isometric Desk Drawing */}
-              <div className="relative w-72 h-44 border-b-4 border-amber-800 bg-brand-red/5 rounded-lg flex flex-col justify-end items-center p-2 group transition-all duration-300">
+              <div className="relative w-72 h-44 border-b-4 border-amber-800 bg-brand-accent/5 rounded-lg flex flex-col justify-end items-center p-2 group transition-all duration-300">
                 {/* Desk Wood surface */}
                 <div className={`absolute bottom-0 left-0 right-0 h-4 rounded-b-md transition-colors duration-300 ${
                   data.color === "Walnut" ? "bg-amber-900" : data.color === "White" ? "bg-neutral-100" : "bg-neutral-900"
@@ -525,7 +525,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                   <div className="absolute -bottom-8 w-20 h-24 bg-neutral-900 border border-neutral-700 rounded-t-2xl z-30 flex flex-col justify-between items-center p-2 shadow-2xl">
                     <div className="w-10 h-4 bg-neutral-800 border border-neutral-600 rounded-full" />
                     <div className="w-16 h-12 bg-neutral-800 border-x border-neutral-600 rounded-sm flex items-center justify-center">
-                      <div className="w-10 h-1 bg-brand-red rounded-full" />
+                      <div className="w-10 h-1 bg-brand-accent rounded-full" />
                     </div>
                   </div>
                 ) : (
@@ -542,7 +542,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
               </div>
               <div className="flex justify-between text-xs text-neutral-500">
                 <span>Current Rating:</span>
-                <span className="text-brand-red font-bold">{finalScore} / 100</span>
+                <span className="text-brand-accent font-bold">{finalScore} / 100</span>
               </div>
             </div>
           </div>
@@ -555,7 +555,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                 <div
                   key={item.id}
                   className={`bg-white border rounded-brand-card p-4 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-200 ${
-                    isSelected ? "border-brand-red bg-brand-red/[0.02]" : "border-neutral-200 hover:border-neutral-300"
+                    isSelected ? "border-brand-accent bg-brand-accent/[0.02]" : "border-neutral-200 hover:border-neutral-300"
                   }`}
                 >
                   <div className="flex items-center gap-4 w-full sm:w-auto">
@@ -565,7 +565,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
 
                     <div className="flex flex-col gap-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-extrabold text-brand-red uppercase tracking-wider">{item.category}</span>
+                        <span className="text-[10px] font-extrabold text-brand-accent uppercase tracking-wider">{item.category}</span>
                         {item.tag && (
                           <span className="bg-neutral-100 text-neutral-600 text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full scale-90">
                             {item.tag}
@@ -623,7 +623,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
         {data.photo && (
           <div className="bg-neutral-50 border border-neutral-250 p-8 rounded-brand-card flex flex-col gap-8">
             <div className="text-center md:text-left">
-              <span className="text-brand-red font-sans text-[10px] font-bold tracking-widest uppercase">AI Vision Module</span>
+              <span className="text-brand-accent font-sans text-[10px] font-bold tracking-widest uppercase">AI Vision Module</span>
               <h3 className="font-display font-bold text-2xl text-neutral-900 mt-1">AI Posture & Space Diagnostics</h3>
               <p className="text-neutral-600 text-xs mt-1">
                 We analyzed your uploaded photograph. Hover over the pulsing markers to inspect detected ergonomic issues.
@@ -644,13 +644,13 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                 <div className="absolute top-[48%] left-[45%]">
                   <button
                     onClick={() => setActiveHotspot("monitor")}
-                    className="w-8 h-8 rounded-full bg-brand-red/35 flex items-center justify-center animate-pulse border-2 border-brand-red focus:outline-none cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-brand-accent/35 flex items-center justify-center animate-pulse border-2 border-brand-accent focus:outline-none cursor-pointer"
                   >
-                    <span className="w-2.5 h-2.5 rounded-full bg-brand-red" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-brand-accent" />
                   </button>
                   {activeHotspot === "monitor" && (
                     <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-48 bg-white border border-neutral-200 rounded-lg p-3 text-xs z-50 shadow-2xl">
-                      <h5 className="font-bold text-brand-red mb-1 uppercase tracking-wide text-[9px]">Monitor too low</h5>
+                      <h5 className="font-bold text-brand-accent mb-1 uppercase tracking-wide text-[9px]">Monitor too low</h5>
                       <p className="text-neutral-600 text-[10px] leading-normal">
                         Screen height forces neck forward, causing muscle tension. Add a monitor arm.
                       </p>
@@ -662,13 +662,13 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                 <div className="absolute top-[30%] left-[58%]">
                   <button
                     onClick={() => setActiveHotspot("cables")}
-                    className="w-8 h-8 rounded-full bg-brand-red/35 flex items-center justify-center animate-pulse border-2 border-brand-red focus:outline-none cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-brand-accent/35 flex items-center justify-center animate-pulse border-2 border-brand-accent focus:outline-none cursor-pointer"
                   >
-                    <span className="w-2.5 h-2.5 rounded-full bg-brand-red" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-brand-accent" />
                   </button>
                   {activeHotspot === "cables" && (
                     <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-48 bg-white border border-neutral-200 rounded-lg p-3 text-xs z-50 shadow-2xl">
-                      <h5 className="font-bold text-brand-red mb-1 uppercase tracking-wide text-[9px]">Cable clutter</h5>
+                      <h5 className="font-bold text-brand-accent mb-1 uppercase tracking-wide text-[9px]">Cable clutter</h5>
                       <p className="text-neutral-600 text-[10px] leading-normal">
                         Messy layout increases stress levels. Use desk pegboards and sleeves.
                       </p>
@@ -680,13 +680,13 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                 <div className="absolute top-[28%] left-[78%]">
                   <button
                     onClick={() => setActiveHotspot("lighting")}
-                    className="w-8 h-8 rounded-full bg-brand-red/35 flex items-center justify-center animate-pulse border-2 border-brand-red focus:outline-none cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-brand-accent/35 flex items-center justify-center animate-pulse border-2 border-brand-accent focus:outline-none cursor-pointer"
                   >
-                    <span className="w-2.5 h-2.5 rounded-full bg-brand-red" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-brand-accent" />
                   </button>
                   {activeHotspot === "lighting" && (
                     <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-48 bg-white border border-neutral-200 rounded-lg p-3 text-xs z-50 shadow-2xl">
-                      <h5 className="font-bold text-brand-red mb-1 uppercase tracking-wide text-[9px]">Unbalanced light</h5>
+                      <h5 className="font-bold text-brand-accent mb-1 uppercase tracking-wide text-[9px]">Unbalanced light</h5>
                       <p className="text-neutral-600 text-[10px] leading-normal">
                         Harsh side bulb causes visual glare. Mount an asymmetric desk lightbar.
                       </p>

@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/Header.tsx";
 import Hero from "./components/Hero.tsx";
 import FeatureBanners from "./components/FeatureBanners.tsx";
+import AIAdvisorIntro from "./components/AIAdvisorIntro.tsx";
 import NewArrivals from "./components/NewArrivals.tsx";
 import UserCommunity from "./components/UserCommunity.tsx";
 import PromoBanners from "./components/PromoBanners.tsx";
-import AdvisorOnboarding from "./components/AdvisorOnboarding.tsx";
+import OnboardingFlow from "./components/OnboardingFlow.tsx";
 import AIProcessing from "./components/AIProcessing.tsx";
 import ProductCategories from "./components/ProductCategories.tsx";
 import BlogPosts from "./components/BlogPosts.tsx";
@@ -29,6 +30,17 @@ interface OnboardingData {
 
 export default function App() {
   const [view, setView] = useState<ViewState>("landing");
+
+  useEffect(() => {
+    const checkHashRoute = () => {
+      if (window.location.hash === "#test-processing") {
+        setView("processing");
+      }
+    };
+    checkHashRoute();
+    window.addEventListener("hashchange", checkHashRoute);
+    return () => window.removeEventListener("hashchange", checkHashRoute);
+  }, []);
   const [formData, setFormData] = useState<OnboardingData>({
     role: "Software Engineer",
     hours: 8,
@@ -42,6 +54,7 @@ export default function App() {
 
   const startOnboarding = () => {
     setView("onboarding");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleOnboardingComplete = (data: OnboardingData) => {
@@ -62,7 +75,8 @@ export default function App() {
           <main className="flex-grow">
             <Hero onStartAdvisor={startOnboarding} />
             <FeatureBanners />
-            <PromoBanners />
+            <AIAdvisorIntro onStartAdvisor={startOnboarding} />
+            <PromoBanners onStartAdvisor={startOnboarding} />
             <ProductCategories />
             <NewArrivals />
             <UserCommunity />
@@ -74,15 +88,18 @@ export default function App() {
         </>
       )}
 
-      {/* 2. Onboarding View */}
+      {/* 2. Onboarding View — Header visible for brand context */}
       {view === "onboarding" && (
-        <AdvisorOnboarding
-          onBackToLanding={() => setView("landing")}
-          onComplete={handleOnboardingComplete}
-        />
+        <>
+          <Header onStartAdvisor={startOnboarding} alwaysSolid />
+          <OnboardingFlow
+            onBackToLanding={() => setView("landing")}
+            onComplete={handleOnboardingComplete}
+          />
+        </>
       )}
 
-      {/* 3. AI Processing Screen */}
+      {/* 3. AI Processing Screen — full-screen dark visual */}
       {view === "processing" && (
         <AIProcessing onFinished={handleProcessingFinished} />
       )}
@@ -90,7 +107,7 @@ export default function App() {
       {/* 4. Results Screen */}
       {view === "result" && (
         <>
-          <Header onStartAdvisor={startOnboarding} />
+          <Header onStartAdvisor={startOnboarding} alwaysSolid />
           <main className="flex-grow">
             <WorkspaceResult
               data={formData}
@@ -103,3 +120,4 @@ export default function App() {
     </div>
   );
 }
+
