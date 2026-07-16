@@ -23,7 +23,6 @@ interface WorkspaceResultProps {
   onRestart: () => void;
 }
 
-
 interface ShopifyProduct {
   id: number;
   title: string;
@@ -208,7 +207,7 @@ const SETUP_SUGGESTIONS_RAW = [
         fallbackImage: "https://hyperwork.vn/cdn/shop/files/PA02-4.jpg?v=1783495643&width=300",
         fallbackUrl: "https://hyperwork.vn/products/ghe-cong-thai-hoc-hyperwork-sleek",
         impactScore: 15,
-        matchReason: "Tựa đầu 3D nâng đỡ đốt sống cổ tối ưu."
+        matchReason: "Tự tựa đầu 3D nâng đỡ cột sống cổ tối ưu."
       },
       {
         id: "s3-p2",
@@ -356,7 +355,7 @@ const SETUP_SUGGESTIONS_RAW = [
 ];
 
 export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProps) {
-  // Resolve real shopify products into database dynamically
+  // Resolve pre-made gallery template suggestions
   const suggestions = useMemo(() => {
     return SETUP_SUGGESTIONS_RAW.map(setup => ({
       ...setup,
@@ -377,6 +376,184 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
       })
     }));
   }, []);
+
+  // Dynamically generate the AI setup based on user's exact selections & problems
+  const aiGeneratedSuggestion = useMemo(() => {
+    // 1. Pick a matching background image from the real store setups
+    let image = "https://hyperwork.vn/cdn/shop/files/DS02_-_Setups_-_s1_-_1_11zon.jpg?v=1764125309&width=720";
+    if (data.color === "White" || data.style === "Minimal") {
+      image = "https://hyperwork.vn/cdn/shop/files/Setup_Tet_2026_-_5_11zon.jpg?v=1770620641&width=720";
+    } else if (data.color === "Black" || data.style === "Dark") {
+      image = "https://hyperwork.vn/cdn/shop/files/593454481_1171545718516570_984208308408370112_n.jpg?v=1767493515&width=720";
+    } else if (data.color === "Walnut" || data.style === "Wooden") {
+      image = "https://hyperwork.vn/cdn/shop/files/Pro-Capture_One_02s47_11zon.jpg?v=1767460861&width=720";
+    }
+
+    // 2. Select hotspots/items dynamically based on user problems and choices
+    const hotspotsRaw = [];
+    let hotspotIdCounter = 1;
+
+    // Check if they need a chair (Default to true so setup is never empty, customize match reason)
+    const hasChair = data.equipment.includes("Ergonomic Chair") || data.problems.includes("Back pain") || data.problems.includes("Neck pain") || true;
+    if (hasChair) {
+      const keyword = (data.budget < 10 || data.color === "White") ? "airy-oc02" : "sleek";
+      const matchReason = (data.problems.includes("Back pain") || data.problems.includes("Neck pain"))
+        ? "Nâng đỡ thắt lưng & đốt sống cổ, giảm đau mỏi khi ngồi lâu."
+        : "Kiến tạo tư thế ngồi làm việc chuẩn công thái học.";
+      hotspotsRaw.push({
+        id: `ai-p-${hotspotIdCounter++}`,
+        top: 72,
+        left: 50,
+        keyword,
+        productCategory: "Ergonomic Chair",
+        fallbackName: "Ghế Ergonomic HyperWork",
+        fallbackPrice: 5500000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/PA02-4.jpg?v=1783495643&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ghe-cong-thai-hoc-hyperwork-sleek",
+        impactScore: 15,
+        matchReason
+      });
+    }
+
+    // Check if they need a smart desk (Default to true if budget is healthy)
+    const hasDesk = data.equipment.includes("Standing Desk") || data.problems.includes("Back pain") || data.budget >= 10 || true;
+    if (hasDesk) {
+      hotspotsRaw.push({
+        id: `ai-p-${hotspotIdCounter++}`,
+        top: 65,
+        left: 32,
+        keyword: "atlas",
+        productCategory: "Smart Desk",
+        fallbackName: "Bàn nâng hạ thông minh Atlas",
+        fallbackPrice: 5990000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/Pro-Capture_One_s0185_copy_c31225e9-4c6b-45ea-a93f-a864cadb3011.jpg?v=1782875762&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ban-nang-ha-thong-minh-hyperwork-atlas",
+        impactScore: 15,
+        matchReason: "Khung thép vững chãi, thay đổi độ cao linh hoạt để đứng/ngồi làm việc."
+      });
+    }
+
+    // Check if they need a monitor arm (Default to true)
+    const hasArm = data.equipment.includes("Monitor") || data.problems.includes("Neck pain") || data.problems.includes("Limited desk space") || true;
+    if (hasArm) {
+      const keyword = data.color === "White" ? "t6-pro" : "p1";
+      const matchReason = data.problems.includes("Neck pain")
+        ? "Điều chỉnh màn hình ngang tầm mắt, chấm dứt đau mỏi vai gáy."
+        : "Nâng đỡ màn hình lơ lửng, giải phóng 30% diện tích bàn làm việc.";
+      hotspotsRaw.push({
+        id: `ai-p-${hotspotIdCounter++}`,
+        top: 38,
+        left: 48,
+        keyword,
+        productCategory: "Monitor Arm",
+        fallbackName: "Arm nâng đỡ màn hình",
+        fallbackPrice: 1690000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/1_85c5273e-dbf2-40e8-ae68-aaabd2723afa.jpg?v=1782961460&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/gia-do-man-hinh-hyperwork-p1",
+        impactScore: 10,
+        matchReason
+      });
+    }
+
+    // Check if they need light
+    if (data.problems.includes("Poor lighting") || data.problems.includes("Eye strain")) {
+      hotspotsRaw.push({
+        id: `ai-p-${hotspotIdCounter++}`,
+        top: 45,
+        left: 40,
+        keyword: "litemax",
+        productCategory: "Light",
+        fallbackName: "Đèn treo màn hình Litemax",
+        fallbackPrice: 1190000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/Tr_ngLight-Bogoc_8.jpg?v=1774005903&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/den-treo-man-hinh-hyperwork-litemax",
+        impactScore: 10,
+        matchReason: "Chiếu sáng không hắt vào màn hình, bảo vệ mắt khi làm việc tối."
+      });
+    }
+
+    // Check if they need keyboard (Default to true)
+    const hasKeyboard = data.equipment.includes("Mechanical Keyboard") || true;
+    if (hasKeyboard) {
+      hotspotsRaw.push({
+        id: `ai-p-${hotspotIdCounter++}`,
+        top: 56,
+        left: 45,
+        keyword: "silent-key",
+        productCategory: "Keyboard",
+        fallbackName: "Bàn phím cơ Silent",
+        fallbackPrice: 1490000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/11_csopy_11zon.jpg?v=1783390458&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ban-phim-co-hyperwork-silent-key-edition",
+        impactScore: 10,
+        matchReason: "Gõ êm ái, đầm tay, tăng cảm hứng sáng tạo."
+      });
+    }
+
+    // Check if they need deskpad
+    if (data.problems.includes("Wrist pain")) {
+      hotspotsRaw.push({
+        id: `ai-p-${hotspotIdCounter++}`,
+        top: 68,
+        left: 50,
+        keyword: "felt-desk-pad",
+        productCategory: "Accessories",
+        fallbackName: "Thảm nỉ Felt Desk Pad",
+        fallbackPrice: 390000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/PA02-1.jpg?v=1783495644&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/tham-trai-ban-lam-viec-felt-desk-pad",
+        impactScore: 5,
+        matchReason: "Tì đè tay êm ái, bảo vệ khớp tay khi gõ phím lâu."
+      });
+    }
+
+    // Check if they need organizer accessories
+    if (data.problems.includes("Limited desk space") || data.problems.includes("Cable clutter")) {
+      hotspotsRaw.push({
+        id: `ai-p-${hotspotIdCounter++}`,
+        top: 50,
+        left: 65,
+        keyword: "ke-man-hinh",
+        productCategory: "Organizer",
+        fallbackName: "Kệ màn hình Monitor Stand",
+        fallbackPrice: 690000,
+        fallbackImage: "https://hyperwork.vn/cdn/shop/files/Tr_ngLight-Bogoc_8.jpg?v=1774005903&width=300",
+        fallbackUrl: "https://hyperwork.vn/products/ke-man-hinh-go-soi",
+        impactScore: 10,
+        matchReason: "Tạo thêm ngăn trống để cất gọn phụ kiện và đi dây gọn gàng."
+      });
+    }
+
+    // Resolve real shopify data for dynamic AI hotspots
+    const hotspots = hotspotsRaw.map(h => {
+      const real = findRealProduct(h.keyword, h.fallbackName, h.fallbackPrice, h.fallbackImage, h.fallbackUrl);
+      return {
+        id: h.id,
+        top: h.top,
+        left: h.left,
+        productName: real.productName,
+        productCategory: h.productCategory,
+        price: real.price,
+        buyUrl: real.buyUrl,
+        productImage: real.productImage,
+        impactScore: h.impactScore,
+        matchReason: h.matchReason
+      };
+    });
+
+    return {
+      id: "ai_generated",
+      image,
+      title: `Bản thiết kế AI tạo riêng cho bạn`,
+      style: (data.style === "Minimal" ? "Minimalist" : data.style === "Wooden" ? "Cozy" : data.style === "Dark" ? "Creator" : "Ergonomic") as any,
+      color: data.color as any,
+      description: `Thiết kế tùy chỉnh tối ưu dựa trên sở thích và thói quen sử dụng của bạn.`,
+      aspectRatio: "aspect-[4/3]",
+      baseScore: 60,
+      hotspots,
+      matchScore: 100
+    };
+  }, [data]);
 
   const scoredSuggestions = useMemo(() => {
     return suggestions.map((setup) => {
@@ -406,11 +583,13 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
     }).sort((a, b) => b.matchScore - a.matchScore);
   }, [data, suggestions]);
 
-  const [activeSetupId, setActiveSetupId] = useState<string>(scoredSuggestions[0].id);
+  // Default is "ai_generated"
+  const [activeSetupId, setActiveSetupId] = useState<string>("ai_generated");
 
   const activeSuggestion = useMemo(() => {
-    return scoredSuggestions.find(s => s.id === activeSetupId) || scoredSuggestions[0];
-  }, [activeSetupId, scoredSuggestions]);
+    if (activeSetupId === "ai_generated") return aiGeneratedSuggestion;
+    return scoredSuggestions.find(s => s.id === activeSetupId) || aiGeneratedSuggestion;
+  }, [activeSetupId, scoredSuggestions, aiGeneratedSuggestion]);
 
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [previewMode, setPreviewMode] = useState<"concept" | "before">("concept");
@@ -470,7 +649,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-neutral-955 text-white text-xs font-bold px-6 py-3 rounded-full shadow-lg flex items-center gap-2"
+            className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-neutral-950 text-white text-xs font-bold px-6 py-3 rounded-full shadow-lg flex items-center gap-2"
           >
             <CheckCircle size={14} weight="fill" />
             <span>Đã sao chép link chia sẻ!</span>
@@ -482,18 +661,36 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
 
         {/* HEADER BLOCK (CLEAN & SIMPLE) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1.5 items-start">
+
+
             <h2 className="font-display font-black text-3xl sm:text-4xl tracking-tight text-neutral-900">
-              Góc Setup AI Thiết Kế
+              {activeSuggestion.title}
             </h2>
             <div className="flex flex-wrap gap-2 text-xs text-neutral-500 font-medium">
               <span>{data.role}</span>
               <span>•</span>
-              <span>Style: {data.style}</span>
+              <span>Style: {activeSuggestion.style}</span>
               <span>•</span>
-              <span>Tone: {data.color}</span>
+              <span>Tone: {activeSuggestion.color}</span>
             </div>
+            {activeSetupId === "ai_generated" ? (
+              <></>
+            ) : (
+              <div className="flex items-center gap-2 mt-1">
+                <button
+                  onClick={() => {
+                    setActiveSetupId("ai_generated");
+                    setPreviewMode("concept");
+                  }}
+                  className="text-[9px] font-black text-neutral-900  hover:opacity-85 cursor-pointer uppercase tracking-wider"
+                >
+                  Quay lại thiết kế của bạn
+                </button>
+              </div>
+            )}
           </div>
+
 
           <div className="flex items-center gap-2">
             <button
@@ -534,17 +731,18 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
 
             {/* View Mode Switcher Header Overlay */}
             <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-center">
-              <div className="flex bg-white/90 backdrop-blur-md p-1 rounded-full shadow-sm">
+              <div className="flex bg-white p-0.5 rounded-full">
                 <button
                   onClick={() => setPreviewMode("concept")}
-                  className={`text-[9px] sm:text-[10px] font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${previewMode === "concept" ? "bg-neutral-950 text-white" : "text-neutral-650 hover:text-neutral-950"
+                  className={`text-[9px] sm:text-[10px] font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${previewMode === "concept" ? "text-neutral-650 hover:text-neutral-950" : "text-neutral-500"
                     }`}
                 >
                   Bản thiết kế AI
                 </button>
+                <span>|</span>
                 <button
                   onClick={() => setPreviewMode("before")}
-                  className={`text-[9px] sm:text-[10px] font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${previewMode === "before" ? "bg-neutral-950 text-white" : "text-neutral-650 hover:text-neutral-950"
+                  className={`text-[9px] sm:text-[10px] font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${previewMode === "before" ? "text-neutral-650 hover:text-neutral-950" : "text-neutral-500"
                     }`}
                 >
                   Hiện trạng
@@ -552,8 +750,8 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
               </div>
 
               {/* Minimalist circular Score badge */}
-              <div className="flex items-center gap-1 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-sm text-[10px] font-black text-neutral-800">
-                <span>Score: {finalScore}</span>
+              <div className="flex items-center gap-1 bg-white px-3.5 py-1.5 rounded-full text-[10px] font-black text-neutral-800">
+                <span>Độ phù hợp: {finalScore}</span>
               </div>
             </div>
 
@@ -615,7 +813,6 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                         {/* Product Image (Full bleed / Edge-to-edge) */}
                         <div className="w-14 h-14 bg-white rounded-xl overflow-hidden shrink-0">
                           <img src={product.productImage} alt={product.productName} className="w-full h-full object-cover select-none" />
-
                         </div>
 
                         {/* Title & short match info */}
@@ -639,7 +836,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
                           href={product.buyUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[9px] font-bold uppercase px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-850 text-white transition-all shadow-sm cursor-pointer border-0"
+                          className="text-[9px] font-bold uppercase px-4 py-2 rounded-full bg-neutral-900 hover:bg-neutral-850 text-white transition-all shadow-sm cursor-pointer border-0"
                         >
                           Mua
                         </a>
@@ -669,7 +866,7 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
 
               <button
                 onClick={() => alert("Đã thêm toàn bộ các sản phẩm đã kích hoạt vào giỏ hàng HyperWork!")}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-xs font-bold bg-neutral-950 hover:bg-neutral-900 text-white transition-all shadow-sm cursor-pointer border-0"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-xs font-bold bg-neutral-950 hover:bg-neutral-900 text-white transition-all shadow-sm cursor-pointer border-0"
               >
                 <span>Mua trọn bộ đã chọn</span>
               </button>
@@ -681,8 +878,8 @@ export default function WorkspaceResult({ data, onRestart }: WorkspaceResultProp
         {/* PINTEREST MASONRY SECTION */}
         <div className="flex flex-col gap-4 mt-4">
           <div className="flex items-center gap-2">
-            <h3 className="font-black uppercase tracking-wider">
-              Ý tưởng gợi ý thêm cho bạn
+            <h3 className="font-black uppercase tracking-wider text-xs text-neutral-400">
+              Ý tưởng gợi ý thêm cho bạn (Pinterest)
             </h3>
           </div>
 
